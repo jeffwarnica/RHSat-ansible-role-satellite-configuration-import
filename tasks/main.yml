@@ -1,2 +1,20 @@
 ---
-# tasks file for RHSat-configuration
+- name: Hello World
+  debug:
+    msg: Hello from Ansible-Role-Satellite-Configuration-Import
+
+- name: create temporary git repository directory
+  tempfile:
+    state: directory
+  register: git_root_dir
+
+- name: Clone existing repository to {{ git_root_dir.path }}
+  shell: |
+    cd {{ git_root_dir.path }}
+    git clone {{ import_git_url }} repo
+    cd repo
+    git checkout {{ import_git_branch }}
+
+- name: Organizations
+  import_tasks: orgs.yml
+
