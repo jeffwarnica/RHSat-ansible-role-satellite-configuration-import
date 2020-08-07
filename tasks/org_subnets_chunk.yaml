@@ -36,5 +36,5 @@
     mtu: '{{ _subnet.mtu }}'
     network: '{{ _subnet.network }}'
     network_type: '{{ _subnet.network_type }}'
-    vlanid: '{{ _subnet.vlanid }}'
+    vlanid: '{{ _subnet.vlanid | int }}'
 
