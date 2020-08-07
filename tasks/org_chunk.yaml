@@ -60,7 +60,7 @@
 #    loop_var: _repo_file
 
 - name: Process each domain yaml
-  include_tasks: org_domain_chunk.yaml
+  include_tasks: org_domains_chunk.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/repositories/*.yaml'
   loop_control:
