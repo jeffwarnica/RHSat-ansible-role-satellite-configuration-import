@@ -1,0 +1,37 @@
+- name: 'Working on product yaml {{ _product_file }}'
+  include_vars:
+    file: '{{ _product_file }}'
+    name: _product
+
+- name: Debug out _product
+  debug:
+    var: _product
+    verbosity: 1
+
+- name: Add to global product dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    products: "{{products | default([]) | combine({_product.id: _product}) }}"
+
+- name: Debug out products
+  debug:
+    var: products
+    verbosity: 1
+
+- name: 'Create/Update product id {{ _product.id }} / {{ _product.name }}'
+  theforeman.foreman.product:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _product.name }}'
+    sync_plan: '{{ _product.product.sync_plan  or omit}}'
+    description: '{{ _product.description }}'
+    gpg_key: '{{ content_credentials[_product.gpg_key_id] | default(omit) }}' 
+    ssl_ca_cert: '{{ content_credentials[_product.gpg_key_id] | default(omit) }}'
+    ssl_client_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit)}}' 
+    ssl_client_key: '{{ content_credentials[_product.ssl_client_key_id] | default(omit)}}'
+  when:
+    - _product.product.redhat != false
+
