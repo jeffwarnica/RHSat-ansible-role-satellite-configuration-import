@@ -1,0 +1,28 @@
+- name: 'Working on host_collections yaml {{ _host_collections_file }}'
+  include_vars:
+    file: '{{ host_collections_file }}'
+    name: _host_collection
+
+- name: Debug out _host_collection
+  debug:
+    var: _host_collection
+    verbosity: 1
+
+- name: Add to global host_collections dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    host_collections: "{{ host_collections | default([]) | combine({_host_collection.id: _host_collection}) }}"
+
+- name: Debug out host_collections
+  debug:
+    var: host_collections
+    verbosity: 2
+
+- name: Create/Update Host Collections 
+  theforeman.foreman.host_collection:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _host_collection.name }}'
