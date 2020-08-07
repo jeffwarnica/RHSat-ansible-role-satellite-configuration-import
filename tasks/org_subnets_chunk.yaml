@@ -1,0 +1,31 @@
+- name: 'Working on subnets yaml {{ _subnets_file }}'
+  include_vars:
+    file: '{{ _subnets_file }}'
+    name: _subnets
+
+- name: Debug out _subnets
+  debug
+    var: _subnets
+    verbosity: 1
+
+- name: Add to global subnets dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    subnets: "{{ subnets | default([]) | combine({_subnets.id: _subnets}) }}"
+
+- name: Debug out subnets
+  debug:
+    var: subnets
+    verbosity: 2
+
+- name: Create/Update Subnets
+
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _subnets.name }}'
+    content_type: '{{ _subnets.content_type }}'
+    content: '{{ _subnets.content }}'
+
