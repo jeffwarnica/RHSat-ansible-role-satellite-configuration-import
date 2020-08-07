@@ -73,4 +73,11 @@
   loop_control:
     loop_var: _subnets_file
 
+- name: Process each host collection yaml
+  include_tasks: org_host_collections_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/host_collections/*.yaml'
+  loop_control:
+    loop_var: _host_collections_file
+
 
