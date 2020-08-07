@@ -15,8 +15,8 @@ import_git_url:
 import_git_branch:
 	Git URL and branch name of source content.
 
-satellite_admin_username:
-satellite_admin_password:
+satellite_api_username:
+satellite_api_password:
 	Credentials to access the Satellite API.
 
 Dependencies
