@@ -8,7 +8,7 @@
     var: _repo
     verbosity: 1
 
-- name: Create repository
+- name: "Create repository: [{{_repo.product.name}}]"
   theforeman.foreman.repository:
     username: '{{ satellite_api_username }}'
     password: '{{ satellite_api_password }}'
@@ -20,5 +20,5 @@
     organization: '{{ _org.name }}'
     url: '{{ _repo.url }}'
     download_policy: '{{ _repo.download_policy }}'
-  when: _repo.product is defined and _repo.product == 'redhat'
+  when: _repo.product is defined and not _repo.product.redhat
 

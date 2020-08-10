@@ -38,6 +38,13 @@
       name: '{{ _org.name }}'
       description: '{{ _org.description }}(Imported)'
 
+- name: Process Sync Plans
+  include_tasks: org_sync_plans.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/sync_plans/*yaml'
+  loop_control:
+    loop_var: _sync_plan_file
+
 - name: Process each content_credentials yaml
   include_tasks: org_content_credentials_chunk.yaml
   with_fileglob:

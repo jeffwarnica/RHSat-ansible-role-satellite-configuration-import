@@ -1,0 +1,34 @@
+- name: 'Working on sync_plan yaml {{ _sync_plan_file }}'
+  include_vars:
+    file: '{{ _sync_plan_file }}'
+    name: _sync_plan
+
+- name: Debug out _sync_plan
+  debug:
+    var: _sync_plan
+    verbosity: 1
+
+- name: Add to global sync_plan dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    products: "{{ sync_plans | default([]) | combine({_sync_plan.id: _sync_plan}) }}"
+
+- name: Debug out sync_plans
+  debug:
+    var: sync_plans
+    verbosity: 1
+
+- name: 'Create/Update Sync Plan id {{ _sync_plan.id }} {{ _sync_plan.name }} [{{ _sync_plan.cron_expression }}]'
+  theforeman.foreman.sync_plan:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _sync_plan.name }}'
+    description: '{{ _sync_plan.description }}'
+    cron_expression: '{{ _sync_plan.cron_expression if _sync_plan.interval == "custom cron" else omit }}'
+    enabled: '{{ _sync_plan.enabled }}'
+    interval: '{{ _sync_plan.interval }}'
+    sync_date: '{{ _sync_plan.sync_date }}'
+    
