@@ -26,12 +26,13 @@
     state: present
     organization: '{{ _org.name }}'
     name: '{{ _product.name }}'
-    sync_plan: '{{ _product.product.sync_plan  or omit}}'
+    sync_plan: '{{ _product.sync_plan.name| default(omit) }}'
     description: '{{ _product.description }}'
     gpg_key: '{{ content_credentials[_product.gpg_key_id] | default(omit) }}' 
     ssl_ca_cert: '{{ content_credentials[_product.gpg_key_id] | default(omit) }}'
     ssl_client_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit)}}' 
     ssl_client_key: '{{ content_credentials[_product.ssl_client_key_id] | default(omit)}}'
   when:
-    - _product.product.redhat != false
+    - _product.provider is defined and _product.provider.name != "Red Hat"
+
 
