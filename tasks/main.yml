@@ -21,7 +21,7 @@
 - name: Process each compute profile yaml
   include_tasks: global_compute_profiles_chunk.yaml
   with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global}/compute_profiles/*.yaml'
+    - '{{ git_root_dir.path }}/repo/managed/global/compute_profiles/*.yaml'
   loop_control:
     loop_var: _compute_profiles_file
 

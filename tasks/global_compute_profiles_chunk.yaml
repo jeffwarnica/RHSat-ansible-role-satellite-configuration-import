@@ -24,4 +24,4 @@
     password: '{{ satellite_api_password }}' 
     server_url: 'https://{{ ansible_host }}'
     state: present
-    name: '{{ _comupte_profile.name }}'
+    name: '{{ _compute_profile.name }}'
