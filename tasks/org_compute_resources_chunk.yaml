@@ -27,4 +27,4 @@
     organizations: '{{ _org.name }}'
     name: '{{ _compute_resource.name }}'
     description: '{{ _compute_resource.description }} '
-    provider: '{{ _compute_resource.provider }} '
+    provider: '{{ _compute_resource.provider | lower | replace(" ", "") }} '
