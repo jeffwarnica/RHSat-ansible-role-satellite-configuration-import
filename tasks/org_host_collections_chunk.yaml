@@ -1,6 +1,6 @@
 - name: 'Working on host_collections yaml {{ _host_collections_file }}'
   include_vars:
-    file: '{{ host_collections_file }}'
+    file: '{{ _host_collections_file }}'
     name: _host_collection
 
 - name: Debug out _host_collection
