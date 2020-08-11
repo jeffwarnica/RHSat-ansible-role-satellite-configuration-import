@@ -52,33 +52,33 @@
   loop_control:
     loop_var: _content_credentials_file
 
-#- name: Process each products yaml
-#  include_tasks: org_product_chunk.yaml
-#  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/products/*yaml'
-#  loop_control:
-#    loop_var: _product_file
+- name: Process each products yaml
+  include_tasks: org_product_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/products/*yaml'
+  loop_control:
+    loop_var: _product_file
 
-#- name: Process each repository yaml
-#  include_tasks: org_repository_chunk.yaml
-#  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/repositories/*.yaml'
-#  loop_control:
-#    loop_var: _repo_file
+- name: Process each repository yaml
+  include_tasks: org_repository_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/repositories/*.yaml'
+  loop_control:
+    loop_var: _repo_file
 
-#- name: Process each domain yaml
-#  include_tasks: org_domains_chunk.yaml
-#  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/domains/*.yaml'
-#  loop_control:
-#    loop_var: _domains_file
+- name: Process each domain yaml
+  include_tasks: org_domains_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/domains/*.yaml'
+  loop_control:
+    loop_var: _domains_file
 
-#- name: Process each subnet yaml
-#  include_tasks: org_subnets_chunk.yaml
-#  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/subnets/*.yaml'
-#  loop_control:
-#    loop_var: _subnets_file
+- name: Process each subnet yaml
+  include_tasks: org_subnets_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/subnets/*.yaml'
+  loop_control:
+    loop_var: _subnets_file
 
 - name: Process each host collection yaml
   include_tasks: org_host_collections_chunk.yaml
@@ -86,12 +86,3 @@
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/host_collections/*.yaml'
   loop_control:
     loop_var: _host_collections_file
-
-#- name: Process each compute resource yaml
-#  include_tasks: org_compute_resources_chunk.yaml
-#  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/compute_resources/*.yaml'
-#  loop_control:
-#    loop_var: _compute_resources_file
-
-
