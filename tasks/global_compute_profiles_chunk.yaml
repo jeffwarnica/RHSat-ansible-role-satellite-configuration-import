@@ -1,0 +1,27 @@
+- name: 'Working on compute profiles yaml {{ _compute_profiles_file }}'
+  include_vars:
+    file: '{{ _compute_profiles_file }}'
+    name: _compute_profile
+
+- name: Debug out _compute_profile
+  debug:
+    var: _compute_profile
+    verbosity: 1
+
+- name: Add to global compute_profiles dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    compute_profiles: "{{ compute_profiles | default([]) | combine({_compute_profile.id: _compute_profile}) }}"
+
+- name: Debug out compute_profiles
+  debug:
+    var: compute_profiles
+    verbosity: 2
+
+- name: Create/Update Compute Profiles 
+  theforeman.foreman.compute_profile:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    name: '{{ _comupte_profile.name }}'
