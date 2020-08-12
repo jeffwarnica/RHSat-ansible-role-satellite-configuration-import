@@ -1,0 +1,8 @@
+- name: "Load in {{ _env_file }} file"
+  include_vars:
+    file:  '{{ _env_file }}'
+    name: _env
+
+- name: Add to environments
+  set_fact:
+    environments: "{{ environments | default([]) | combine({ _env.id: _env})}}"

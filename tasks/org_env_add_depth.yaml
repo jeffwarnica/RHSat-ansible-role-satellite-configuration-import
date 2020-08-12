@@ -1,0 +1,12 @@
+- name: Debug
+  debug:
+    msg: 
+      - "At depth [{{ _add_depth.key }}]"
+      - "_add_depth.value: [{{ _add_depth.value }}]"
+
+- name: "Loop over individual environments at depth [{{ _add_depth.key}}]"
+  include_tasks: org_env_add_depth_env.yaml
+  loop: "{{ _environments_at_depth[_add_depth.key]|dict2items}}"
+  loop_control:
+    loop_var: _add_env
+
