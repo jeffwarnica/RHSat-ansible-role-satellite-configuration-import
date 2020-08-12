@@ -1,0 +1,15 @@
+- name: debug out _location_to_add
+  debug:
+    msg: 
+      - "item: [ {{ _location_to_add }} ]"
+      #- "item??: {
+    verbosity: 1
+
+- name: "Import location [{{_location_to_add.value.parent_name }}] "
+  theforeman.foreman.location:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    name: '{{ _location_to_add.value.name }}'
+    parent: '{{ _location_to_add.value.parent_name if _location_to_add.value.parent_name else omit }}'

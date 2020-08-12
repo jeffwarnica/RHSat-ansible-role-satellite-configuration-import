@@ -1,0 +1,9 @@
+- name: Process each location yamls
+  include_tasks: global_location_read.yml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/locations/*yaml'
+
+- name: Top down, import per depth
+  include_tasks: global_location_per_depth.yml
+  loop: "{{locations.keys()|sort }}" 
+

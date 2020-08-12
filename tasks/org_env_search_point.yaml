@@ -1,0 +1,51 @@
+#
+
+- name: "Load in {{ _env_file }} file"
+  include_vars:
+    file:  '{{ _env_file }}'
+    name: _env
+
+- name: "Only care about envs with a prior.id from the top of our search stack"
+  block:
+    - name: rebuild _environments_at_this_depth
+      set_fact:
+        _environments_at_this_depth: "{{ _environments_at_depth[_depth] | default([]) | combine({ _env.id: _env }) }}"
+
+    - name: Add to _this_orgs_environments
+      set_fact:
+        _environments_at_depth: "{{ _environments_at_depth | combine({_depth: _environments_at_this_depth} ) }}"
+
+    - name: Update vars for recursion
+      set_fact:
+        _depth: "{{ _depth + 1 }}"
+        _search_for: "{{ _search_for + [_env.id]}}"
+
+    - name: Start searching for environments
+      include_tasks: org_env_search_point.yaml
+      with_fileglob:
+        - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/*.yaml'
+      loop_control:
+        loop_var: _env_file
+
+    - name: Reset vars after recursion
+      set_fact:
+        _depth: "{{ _depth - 1 }}"
+        _search_for: "{{ _search_for | union([_search_for[-1]])  }}" 
+  # block
+  when: _env.prior and _env.prior.id == _search_for[-1]
+
+
+#- name: Reset and setup variables for this org
+#  set_fact:
+#    _depth: 1
+#    _search_for: "{{[ _this_org_library.id ] }}"
+#    _this_orgs_environments: "{{[1: []]}}"
+#
+#
+#- name: Start searching for environments
+#  include_tasks: org_env_search_point.yaml
+#  with_fileglob:
+#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/*.yaml'
+#  loop_control:
+#    loop_var: _env_file
+

@@ -1,0 +1,53 @@
+#
+## Environments are tricky.
+# They are per-org, and can have the same name
+# They are hierachial, and have pointes to their parent, but not a path vlaue
+# like locations, so we need to get createive to load in a useful data structure.
+#
+# Also note Ansible doesn't have functions, really, so we have to fake out a stack
+# to keep track of where we are.
+#
+# Load "Library" (well known, depth 0)
+#       Set _depth, 
+#       Add to_search_for list (making a stack)
+#
+#START RECURSION:
+# Loop over all other files, loading those with parent_id=_search_for[-1]
+#       Store in libraries[_depth][]
+#       push id to _search_for
+#       set _depth=_depth+1
+#       RECURSE
+#       set _depth=_depth-1
+#
+# Thus, we store the environments by depth, but not quite in a tree, because we don't care.
+#
+
+
+
+#
+#The Library is well known (by name), so load that, store it, and keep its ID handy for recursion
+- name: Load in this environments Library.yaml file
+  include_vars:
+    file:  '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/Library.yaml'
+    name: _this_org_library
+
+- name: Reset and setup variables for this org
+  set_fact:
+    _depth: 1
+    _search_for: "{{[ _this_org_library.id ] }}"
+    _environments_at_depth: "{{ {0: [ _this_org_library ] }  }}"
+
+
+- name: Start searching for environments
+  include_tasks: org_env_search_point.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/*.yaml'
+  loop_control:
+    loop_var: _env_file
+
+
+- name: Debug out _environments_at_depth
+  debug:
+    var: _environments_at_depth
+    verbosity: 1
+

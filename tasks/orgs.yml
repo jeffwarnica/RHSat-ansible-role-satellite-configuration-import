@@ -1,4 +1,3 @@
-# of course things have to be difficult, and the oasis role doesn't handle orgs
 
 - name: Process each Org yamls
   include_tasks: org_chunk.yaml
