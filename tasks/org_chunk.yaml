@@ -38,6 +38,13 @@
       name: '{{ _org.name }}'
       description: '{{ _org.description }}(Imported)'
 
+
+- name: Handle Environments
+  include_tasks: org_environment.yaml
+
+- fail:
+
+
 - name: Process Sync Plans
   include_tasks: org_sync_plans.yaml
   with_fileglob:
@@ -65,6 +72,4 @@
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/repositories/*.yaml'
   loop_control:
     loop_var: _repo_file
-
-
 
