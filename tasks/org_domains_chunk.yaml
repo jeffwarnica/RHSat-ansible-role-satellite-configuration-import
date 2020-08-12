@@ -1,0 +1,28 @@
+- name: 'Working on domains yaml {{ _domains_file }}'
+  include_vars:
+    file: '{{ _domains_file }}'
+    name: _domain
+
+- name: Debug out _domain
+  debug:
+    var: _domain
+    verbosity: 1
+
+- name: Add to global domains dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    domains: "{{ domains | default([]) | combine({_domain.id: _domain}) }}"
+
+- name: Debug out domains
+  debug:
+    var: domains
+    verbosity: 2
+
+- name: Create/Update Domains 
+  theforeman.foreman.domain:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _org.name }}'
+    name: '{{ _domain.name }}'
