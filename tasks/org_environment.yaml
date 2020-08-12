@@ -4,50 +4,73 @@
 # They are hierachial, and have pointes to their parent, but not a path vlaue
 # like locations, so we need to get createive to load in a useful data structure.
 #
-# Also note Ansible doesn't have functions, really, so we have to fake out a stack
-# to keep track of where we are.
+# Also note Ansible doesn't have functions, really, so  there is a lot of deep
+# variable manipulation to keep track of where we are.
+# And ansible/jinja make it exceptionally difficult to manipulate deep structures,
+# thus the extensive and very explicit manipulation deep in the bottom of the 
+# "recursion"
 #
-# Load "Library" (well known, depth 0)
-#       Set _depth, 
-#       Add to_search_for list (making a stack)
+#OVERVIEW:
 #
-#START RECURSION:
-# Loop over all other files, loading those with parent_id=_search_for[-1]
-#       Store in libraries[_depth][]
-#       push id to _search_for
-#       set _depth=_depth+1
-#       RECURSE
-#       set _depth=_depth-1
+# Load all environments into memory, and identify "Library" (well known, depth 0)
+# Set _environments_at_depth, _found_something_at_depth, _search_for lists (hashes?
+#     (which also brings them into scope at this file, and can be used everwhere)
 #
-# Thus, we store the environments by depth, but not quite in a tree, because we don't care.
+#
+# set our _parent_depth and _children_depth to 0, 1 respectively
+#
+# org_env_search_at_depth_X.yaml: 
+#
+#       loop over each env, 
+#               finding those whose parent is in _search_for[_parent_depth]
+#                       keeping track of in _environments_at_depth[_children_depth]
+#                       flagging if anything at _children_depth is found
+#       recursion if something found
+#               bump _x_depth vars
+#               call self        
+
+# Thus, we store the environments by depth, but not in a tree, because we can neither
+# walk the tree later, or care about doing more than depth walking later.
 #
 
-
-
-#
-#The Library is well known (by name), so load that, store it, and keep its ID handy for recursion
-- name: Load in this environments Library.yaml file
-  include_vars:
-    file:  '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/Library.yaml'
-    name: _this_org_library
-
-- name: Reset and setup variables for this org
-  set_fact:
-    _depth: 1
-    _search_for: "{{[ _this_org_library.id ] }}"
-    _environments_at_depth: "{{ {0: [ _this_org_library ] }  }}"
-
-
-- name: Start searching for environments
-  include_tasks: org_env_search_point.yaml
+- name: Load in all environments into flat structure
+  include_tasks: org_env_load_file.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/environments/*.yaml'
   loop_control:
     loop_var: _env_file
 
+- name: Output all envs
+  debug:
+    var: environments
+
+#The Library is well known (by name), so load that, store it, and keep its ID handy for recursion
+- name: Load hunt for library
+  include_tasks: org_env_find_library.yaml
+  loop: "{{environments|dict2items}}"
+
+- name: Save environment details
+  set_fact:
+    _environments_at_depth: "{{ {0:  { _this_org_library.id |int:_this_org_library}  }  }}"
+    _found_something_at_depth: [0]
+    _search_for: 
+      0: "{{ [ _this_org_library.id |int ]}}"
+  
+- name: Start searching for environments at depth 0
+  include_tasks: org_env_search_at_depth_X.yaml
+  vars:
+    _parent_depth: 0
+    _children_depth: 1
 
 - name: Debug out _environments_at_depth
   debug:
     var: _environments_at_depth
     verbosity: 1
+
+- name: Loop over environment depths
+  include_tasks: org_env_add_depth.yaml
+  loop: "{{ _environments_at_depth|dict2items}}"
+  loop_control:
+    loop_var: _add_depth
+
 

@@ -39,11 +39,8 @@
       description: '{{ _org.description }}(Imported)'
 
 
-- name: Handle Environments
+- name: Handle Lifecycle Environments
   include_tasks: org_environment.yaml
-
-- fail:
-
 
 - name: Process Sync Plans
   include_tasks: org_sync_plans.yaml
