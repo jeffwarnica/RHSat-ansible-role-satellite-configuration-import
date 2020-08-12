@@ -1,0 +1,28 @@
+- name: 'Working on activation_keys yaml {{ _activation_keys_file }}'
+  include_vars:
+    file: '{{ _activation_keys_file }}'
+    name: _activation_key
+
+- name: Debug out _activation_key
+  debug:
+    var: _activation_key
+    verbosity: 1
+
+- name: Add to global activation_keys dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    activation_keys: "{{ activation_keys | default([]) | combine({_activation_key.id: _activation_key}) }}"
+
+- name: Debug out activation_keys
+  debug:
+    var: activation_keys
+    verbosity: 2
+
+- name: Create/Update Activation Keys 
+  theforeman.foreman.activation_key:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _org.name }}'
+    name: '{{ _activation_key.name }}'
