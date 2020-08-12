@@ -1,0 +1,30 @@
+- name: 'Working on compute_resources yaml {{ _compute_resources_file }}'
+  include_vars:
+    file: '{{ _compute_resources_file }}'
+    name: _compute_resource
+
+- name: Debug out _compute_resource
+  debug:
+    var: _compute_resource
+    verbosity: 1
+
+- name: Add to global compute_resources dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    compute_resources: "{{ compute_resources | default([]) | combine({_compute_resource.id: _compute_resource}) }}"
+
+- name: Debug out compute_resources
+  debug:
+    var: compute_resources
+    verbosity: 2
+
+- name: Create/Update Compute Resources
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _org.name }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description }} '
+    provider: '{{ _compute_resource.provider | lower | replace(" ", "") }} '
