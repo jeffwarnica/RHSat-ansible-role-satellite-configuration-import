@@ -28,3 +28,9 @@
   loop_control:
     loop_var: _compute_profiles_file
 
+- name: Cleanup tmp location
+  file:
+    path: "{{ git_root_dir.path }}"
+    state: absent
+  when: io_git_keep_repos is undefined or not io_git_keep_repos
+
