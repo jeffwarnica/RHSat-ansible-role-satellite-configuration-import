@@ -87,9 +87,16 @@
   loop_control:
     loop_var: _host_collections_file
 
-#- name: Process each compute resource yaml
-#  include_tasks: org_compute_resources_chunk.yaml
+#- name: Process each activation key yaml
+#  include_tasks: org_activation_keys_chunk.yaml
 #  with_fileglob:
-#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/compute_resources/*.yaml'
+#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/activation_keys/*.yaml'
 #  loop_control:
-#    loop_var: _compute_resources_file
+#    loop_var: _activation_keys_file
+
+- name: Process each compute resource yaml
+  include_tasks: org_compute_resources_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/compute_resources/*.yaml'
+  loop_control:
+    loop_var: _compute_resources_file
