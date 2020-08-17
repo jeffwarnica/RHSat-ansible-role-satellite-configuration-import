@@ -1,0 +1,35 @@
+
+#Content views are special insofar as they are regular or composite
+#So while more difficult to handle than n-layer recursive structures, 
+# we do have to do with 2 specific layers
+#
+- name: initialize facts
+  set_fact:
+    content_views: []
+
+- name: Load each content view yaml
+  include_tasks: org_content_view_load_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_views/*.yaml'
+  loop_control:
+    loop_var: _content_view_file
+
+- name: Debug out content_views
+  debug:
+    var: content_views
+    verbosity: 1
+
+- name: Import non-composite CVs
+  include_tasks: org_content_view_import_chunk.yaml
+  when: not _cv.value.composite
+  loop: "{{ content_views|dict2items}}"
+  loop_control:
+    loop_var: _cv
+
+- name: Import composite CVs
+  include_tasks: org_content_view_import_chunk.yaml
+  when: _cv.value.composite
+  loop: "{{ content_views|dict2items}}"
+  loop_control:
+    loop_var: _cv
+

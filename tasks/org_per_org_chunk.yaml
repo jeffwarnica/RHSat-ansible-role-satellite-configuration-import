@@ -1,0 +1,106 @@
+- name: 'Working on organization yaml {{ item }}'
+  include_vars:
+    file: '{{ item }}'
+    name: _org
+
+- name: Debug out _org
+  debug:
+    var: _org
+    verbosity: 1
+
+- name: Reset per org variabbles
+  set_fact:
+    repositories_by_name: []
+
+- name: Get Org by ID in target Satellite
+  uri:
+    url: 'https://{{ansible_host}}/api/v2/organizations/{{ _org.id }}'
+    force_basic_auth: true
+    body_format: json
+    return_content: true
+    status_code: [200, 404] #not found is OK
+    url_username: "{{ satellite_api_username }}"
+    url_password: "{{ satellite_api_password }}"
+    validate_certs: "{{ satellite_api_validate_certs }}"
+  register: organizations_search_result
+
+# If we get a 200, then the orgid exists, and we must PUT updates to organizations//:id
+#    if a 404, it doesnt, to POST to organizations (no slash)
+    
+- name: Create Org in target Satellite
+  uri:
+    url: "https://{{ansible_host}}/katello/api/v2/organizations{{ '/' +_org.id|string  if organizations_search_result.status == 200 else '' }}"
+    force_basic_auth: true
+    body_format: json
+    return_content: true
+    url_username: "{{ satellite_api_username }}"
+    url_password: "{{ satellite_api_password }}"
+    validate_certs: "{{ satellite_api_validate_certs }}"
+    method: "{{ 'PUT' if organizations_search_result.status == 200 else 'POST' }}"
+    status_code: 200
+    body:
+      name: '{{ _org.name }}'
+      description: '{{ _org.description }}'
+
+
+- name: Handle Lifecycle Environments
+  include_tasks: org_environment.yaml
+
+- name: Process Sync Plans
+  include_tasks: org_sync_plans.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/sync_plans/*yaml'
+  loop_control:
+    loop_var: _sync_plan_file
+
+- name: Process each content_credentials yaml
+  include_tasks: org_content_credentials_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_credentials/*yaml'
+  loop_control:
+    loop_var: _content_credentials_file
+
+- name: Process each products yaml
+  include_tasks: org_product_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/products/*yaml'
+  loop_control:
+    loop_var: _product_file
+
+- name: Process each repository yaml
+  include_tasks: org_repository_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/repositories/*.yaml'
+  loop_control:
+    loop_var: _repo_file
+
+- name: Process content views
+  include_tasks: org_content_views.yaml
+
+- fail:
+
+
+
+
+- name: Process each domain yaml
+  include_tasks: org_domains_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/domains/*.yaml'
+  loop_control:
+    loop_var: _domains_file
+
+- name: Process each subnet yaml
+  include_tasks: org_subnets_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/subnets/*.yaml'
+  loop_control:
+    loop_var: _subnets_file
+
+- name: Process each host collection yaml
+  include_tasks: org_host_collections_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/host_collections/*.yaml'
+  loop_control:
+    loop_var: _host_collections_file
+
+

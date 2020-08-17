@@ -1,0 +1,13 @@
+- name: 'Working on content_view {{ _content_view_file }}'
+  include_vars:
+    file: '{{ _content_view_file }}'
+    name: _content_view
+
+- name: Debug out _content_view
+  debug:
+    var: _content_view
+    verbosity: 1
+
+- name: Add to global content_views dict
+  set_fact:
+    content_views: "{{ content_views | default([]) | combine({_content_view.id: _content_view}) }}"

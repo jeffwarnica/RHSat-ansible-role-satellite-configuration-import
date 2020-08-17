@@ -1,5 +1,5 @@
 
-- name: Process each Org yamls
-  include_tasks: org_chunk.yaml
+- name: Process each Organization
+  include_tasks: org_per_org_chunk.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/organizations/*yaml'
