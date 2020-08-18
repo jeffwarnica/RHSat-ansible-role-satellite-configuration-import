@@ -22,6 +22,11 @@
   loop_control:
     loop_var: _r
 
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
 - name: Build locations list
   set_fact: 
     _locations: "{{ _locations | default([]) + [ _r.name ] }}"
@@ -43,7 +48,7 @@
     organizations: '{{ _orgs }}'
     name: '{{ _domain.name }}'
     description: '{{ _domain.fullname | default(omit) }}'
-    #dns_proxy: '{{ _domain.dns | default(omit) }}'
+    #dns_proxy: '{{ _domain.dns | default(null) }}'
     locations: '{{ _locations }}' 
 
 
