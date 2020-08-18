@@ -1,0 +1,63 @@
+- name: "Working on CV {{ _cv.value.name }}"
+  debug:
+    msg: "_cv.value is [[[ {{ _cv.value }} ]]]"
+    msg: "repositories_by_name is: [[[ {{ repositories_by_name }} ]]]"
+    verbosity: 2
+
+- name: Reset _repos
+  set_fact:
+    _repos: []
+- name: Build Repositories
+  set_fact:
+    _repos: "{{ _repos + [{'name': _r.name, 'product': repositories_by_name[_r.name].product.name}]  }}"
+  loop: '{{ _cv.value.repositories }}'
+  loop_control:
+    loop_var: _r
+- name: out _r 
+  debug:
+    msg: "_repos as yaml looks like: [[ {{ _repos|to_nice_yaml }} ]]"
+    verbosity: 2
+
+- name: "Create/Update Base Content View [{{_cv.value.name }}]"
+  theforeman.foreman.content_view:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _cv.value.name }}'
+    composite: false
+    description: '{{ _cv.value.description | default(omit) }}'
+    repositories: '{{ _repos | default(omit) }}'
+  when:  _cv.value.name != "Default Organization View" and not _cv.value.composite
+
+- name: Composite CV path
+  block:
+  - name: Reset components
+    set_fact:
+      _components: []
+  - name: Build latest_components 
+    set_fact:
+      _components: >- 
+        {{ 
+                _components + [{'content_view': _c.content_view.name, 'latest': 'yes'}] 
+                if _c.content_view.latest_version != ''  else
+                _components + [{'content_view': _c.content_view.name, 'latest': 'no', 'content_view_version': _c.content_view.latest_version}]
+        }}
+    loop: '{{ _cv.value.content_view_components }}'
+    loop_control:
+      loop_var: _c
+  - name: "Create/Update Composite Content View [{{_cv.value.name }}]"
+    theforeman.foreman.content_view:
+      username: '{{ satellite_api_username }}'
+      password: '{{ satellite_api_password }}'
+      server_url: 'https://{{ ansible_host }}'
+      state: present
+      organization: '{{ _org.name }}'
+      name: '{{ _cv.value.name }}'
+      composite: true
+      description: '{{ _cv.value.description | default(omit) }}'
+#      repositories: '{{ _repos | default(omit) }}'
+      components: '{{ _components }}'
+  when:  _cv.value.name != "Default Organization View" and _cv.value.composite
+

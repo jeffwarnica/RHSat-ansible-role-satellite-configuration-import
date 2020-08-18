@@ -1,0 +1,4 @@
+- name: Set Library ID if Library
+  set_fact:
+    _this_org_library: "{{ item.value }}"
+  when: item.value.name == "Library"

@@ -1,0 +1,12 @@
+- name: "Add Environment at depth [{{ _add_depth.key}}] named [{{_add_env.value.name}}]"
+  theforeman.foreman.lifecycle_environment:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    name: '{{ _add_env.value.name }}'
+    description: '{{ _add_env.value.description | default(omit) }}'
+    label: '{{ _add_env.value.label | default(omit) }}'
+    organization:  '{{ _add_env.value.organization.name }}'
+    prior:  '{{ _add_env.value.prior.name | default(omit) }}'
+  when: _add_env.value.name != "Library"  
