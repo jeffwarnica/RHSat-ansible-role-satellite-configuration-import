@@ -12,10 +12,36 @@
   set_fact:
                # products dict, or empty dict, plus new k/v 
     activation_keys: "{{ activation_keys | default([]) | combine({_activation_key.id: _activation_key}) }}"
+    _host_collections: []
+    _products: []
 
 - name: Debug out activation_keys
   debug:
     var: activation_keys
+    verbosity: 2
+
+- name: Build host_collections list
+  set_fact: 
+    _host_collections: "{{ _host_collections | default([]) + [ _r.name ] }}"
+  loop: '{{ _activation_key.host_collections | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out _host_collections
+  debug:
+    var: _host_collections
+    verbosity: 2
+
+- name: Build products list
+  set_fact: 
+    _products: "{{ _products | default([]) + [{ 'name': _r.name }] }}"
+  loop: '{{ _activation_key.products | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out _products
+  debug:
+    var: _products
     verbosity: 2
 
 - name: Create/Update Activation Keys 
@@ -26,3 +52,14 @@
     state: present
     organization: '{{ _org.name }}'
     name: '{{ _activation_key.name }}'
+    auto_attach: '{{ _activation_key.auto_attach | default(omit) }}'
+    content_view: '{{ _activation_key.content_view.name | default(omit) }}'
+    lifecycle_environment: '{{ _activation_key.environment.name | default(omit) }}'
+    #max_hosts: '{{ _activation_key.max_hosts | default(omit) | int }}'
+    purpose_role: '{{ _activation_key.purpose_role | default(omit) }}'
+    release_version: '{{ _activation_key.release_version | default(omit) }}'
+    #service_level: '{{ _activation_key.service_level }}'
+    #unlimited_hosts: '{{ _activation_key.unlimited_hosts | default(omit) }}'
+    host_collections: '{{ _host_collections }}'
+    #subscriptions: '{{ _products }}'
+  
