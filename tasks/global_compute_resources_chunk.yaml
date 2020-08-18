@@ -12,6 +12,12 @@
   set_fact:
                # products dict, or empty dict, plus new k/v 
     compute_resources: "{{ compute_resources | default([]) | combine({_compute_resource.id: _compute_resource}) }}"
+    libvirt_provider_params:
+      url: '{{ _compute_resource.url }}'    
+    ovirt_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user }}'    
+      password: '{{ _compute_resource.password }}'    
 
 - name: Debug out compute_resources
   debug:
@@ -26,5 +32,9 @@
     state: present
     organizations: '{{ _org.name }}'
     name: '{{ _compute_resource.name }}'
-    description: '{{ _compute_resource.description }} '
-    provider: '{{ _compute_resource.provider | lower | replace(" ", "") }} '
+    description: '{{ _compute_resource.description }}'
+    provider: '{{ _compute_resource.provider | lower }}'
+    provider_params: '{{ ovirt_provider_params }}'
+     # url: '{{ _compute_resource.url }}'
+     # display_type: ' {{ _compute_resource.display_type | string }}'
+     # user: ' {{_compute_resource.user }}'     

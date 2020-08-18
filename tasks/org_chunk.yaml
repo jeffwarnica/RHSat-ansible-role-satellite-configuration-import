@@ -66,23 +66,17 @@
   loop_control:
     loop_var: _repo_file
 
-- name: Process each domain yaml
-  include_tasks: org_domains_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/domains/*.yaml'
-  loop_control:
-    loop_var: _domains_file
-
-- name: Process each subnet yaml
-  include_tasks: org_subnets_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/subnets/*.yaml'
-  loop_control:
-    loop_var: _subnets_file
-
 - name: Process each host collection yaml
   include_tasks: org_host_collections_chunk.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/host_collections/*.yaml'
   loop_control:
     loop_var: _host_collections_file
+
+- name: Process each activation key yaml
+  include_tasks: org_activation_keys_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/activation_keys/*.yaml'
+  loop_control:
+    loop_var: _activation_keys_file
+
