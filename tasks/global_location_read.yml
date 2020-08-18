@@ -1,0 +1,26 @@
+- name: 'Working on location yaml {{ item }}'
+  include_vars:
+    file: '{{ item }}'
+    name: _location
+
+- name: Debug out _location
+  debug:
+    var: _location
+    verbosity: 1
+
+# Locations are hierarchical, and we need to add them only when their parents exist
+# While recursion isn't obvious in Ansible, what we can do is 
+# do all the locations at a given depth
+- name: Set _depth
+  set_fact:
+    _depth: "{{ _location.title.split('/')|length }}"
+
+- name: Rebuild locations at depth
+  set_fact:
+    _locations_at_depth: "{{ locations[_depth] | default([]) |combine({_location.id: _location} ) }}"
+
+- name: Add to location structure
+  set_fact:
+    locations: "{{ locations | default([]) | combine ({_depth: _locations_at_depth})  }}"
+
+

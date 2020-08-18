@@ -1,0 +1,35 @@
+- name: Debug out on matcher
+  debug:
+    msg:
+      - "Parent Depth: [{{ _parent_depth }}]"
+      - "Children depth: [{{ _children_depth }}]"
+      - "Inspecting _env_to_match.value.id: [{{ _env_to_match.value.id }}]"
+      - "See if prior_id [{{_env_to_match.value.prior.id | default('')}}] is in [{{ _search_for }}]"
+      - "_search_for: [ {{_search_for}} ]"
+      #- "_search_for[_parent_depth|int]: [{{ _search_for[_parent_depth|int] }}]"
+
+- name: "Only care about envs with a prior.id in _search_for"
+  block:
+    - name: rebuild _environments_at_this_depth
+      set_fact:
+        _environments_at_this_depth: "{{ _environments_at_depth[_children_depth] | default([]) | combine({ _env_to_match.value.id: _env_to_match.value }) }}"
+
+    - name: Add to _environments_at_depth
+      set_fact:
+        _environments_at_depth: "{{ _environments_at_depth | combine({_children_depth: _environments_at_this_depth} ) }}"
+
+    - name: rebuild _to_search_for_here
+      set_fact:
+        _to_search_for_here: "{{ _search_for[_children_depth|int] | default([]) + [_env_to_match.value.id] }}"
+
+    - name: Add _to_search_for_here to _search_for
+      set_fact:
+        _search_for: "{{ _search_for | combine({_children_depth|int: _to_search_for_here}) }}"
+
+    - name: Set _found_something_at_depth
+      set_fact:
+        _found_something_at_depth: "{{ _found_something_at_depth + [ _children_depth|int] }}"
+
+ # block
+  when: _env_to_match.value.prior and _env_to_match.value.prior.id in _search_for[_parent_depth|int]
+

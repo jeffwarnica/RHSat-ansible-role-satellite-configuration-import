@@ -1,6 +1,0 @@
-# of course things have to be difficult, and the oasis role doesn't handle orgs
-
-- name: Process each Org yamls
-  include_tasks: org_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/organizations/*yaml'

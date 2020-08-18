@@ -1,0 +1,40 @@
+- name: Debug out at depth X
+  debug:
+    msg:
+      - "At parent depth: [{{ _parent_depth }}]"
+      - "At children depth: [{{ _children_depth }}]"
+      - "Searching for parent IDs: [{{ _search_for }}] "
+      - "_found_something_at_depth: [{{ _found_something_at_depth }}]"
+    verbosity: 1
+
+- name: Reset _new_search_for
+  set_fact:
+    _new_search_for: []
+
+- name: Loop over environments, calling matcher
+  include_tasks: org_env_search_at_depth_X_matcher.yaml 
+  loop: "{{environments|dict2items}}"
+  loop_control:
+    loop_var: _env_to_match
+
+- name: after matcher
+  debug:
+    msg:
+      - "_environments_at_depth [{{ _environments_at_depth }}]"
+      - "_found_something_at_depth: [{{ _found_something_at_depth }}]"
+      - "_search_for: [{{ _search_for }}]"
+    verbosity: 1
+
+- name: Set new index vars
+  set_fact:
+    _new_children_depth: "{{ _children_depth|int+1}}"
+    _new_parent_depth: "{{ _parent_depth|int+1}}"
+
+- name: Call ourselves for the next depth of searching
+  include_tasks: org_env_search_at_depth_X.yaml
+  when: _parent_depth|int in _found_something_at_depth
+  vars:
+    _parent_depth: "{{_new_parent_depth}}"
+    _children_depth: "{{_new_children_depth}}"
+
+    

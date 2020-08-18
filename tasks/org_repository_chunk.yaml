@@ -8,6 +8,10 @@
     var: _repo
     verbosity: 1
 
+- name: Store repositories for later
+  set_fact:
+    repositories_by_name: "{{ repositories_by_name | default([]) | combine({ _repo.name: _repo}) }}"
+
 - name: "Create repository: [{{_repo.product.name}}]"
   theforeman.foreman.repository:
     username: '{{ satellite_api_username }}'
