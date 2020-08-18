@@ -45,6 +45,5 @@
     description: '{{ _domain.fullname | default(omit) }}'
     #dns_proxy: '{{ _domain.dns | default(omit) }}'
     locations: '{{ _locations }}' 
-    #parameters: '{{ _domain.parameters }}'
-    
+
 
