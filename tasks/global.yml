@@ -7,4 +7,24 @@
   include_tasks: global_location_per_depth.yml
   loop: "{{locations.keys()|sort }}" 
   when: false
- 
+
+- name: Process each domain yaml
+  include_tasks: global_domains_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/domains/*.yaml'
+  loop_control:
+    loop_var: _domains_file
+
+- name: Process each subnets yaml
+  include_tasks: global_subnets_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/subnets/*.yaml'
+  loop_control:
+    loop_var: _subnets_file
+
+- name: Process each compute profile yaml
+  include_tasks: global_compute_profiles_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/compute_profiles/*.yaml'
+  loop_control:
+    loop_var: _compute_profiles_file 

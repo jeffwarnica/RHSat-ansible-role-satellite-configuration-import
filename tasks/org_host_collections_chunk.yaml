@@ -26,3 +26,4 @@
     state: present
     organization: '{{ _org.name }}'
     name: '{{ _host_collection.name }}'
+    description: '{{ _host_collection.description | default(omit) }}'

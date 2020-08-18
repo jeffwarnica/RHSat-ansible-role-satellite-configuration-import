@@ -12,7 +12,23 @@
   set_fact:
                # products dict, or empty dict, plus new k/v 
     domains: "{{ domains | default([]) | combine({_domain.id: _domain}) }}"
+    _orgs: []
+    _locations: []
 
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _domain.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.name ] }}"
+  loop: '{{ _domain.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+     
 - name: Debug out domains
   debug:
     var: domains
@@ -24,5 +40,10 @@
     password: '{{ satellite_api_password }}' 
     server_url: 'https://{{ ansible_host }}'
     state: present
-    organizations: '{{ _org.name }}'
+    organizations: '{{ _orgs }}'
     name: '{{ _domain.name }}'
+    description: '{{ _domain.fullname | default(omit) }}'
+    #dns_proxy: '{{ _domain.dns | default(omit) }}'
+    locations: '{{ _locations }}' 
+
+

@@ -1,0 +1,74 @@
+- name: 'Working on subnets yaml {{ _subnets_file }}'
+  include_vars:
+    file: '{{ _subnets_file }}'
+    name: _subnet
+
+- name: Debug out _subnet
+  debug:
+    var: _subnet
+    verbosity: 1
+
+- name: Add to global subnets dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    subnets: "{{ subnets | default([]) | combine({_subnet.id: _subnet}) }}"
+    _orgs: []
+    _locations: []
+    _domains: []
+
+- name: Debug out subnets
+  debug:
+    var: subnets
+    verbosity: 2
+
+- name: Build orgs list
+  set_fact:
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _subnet.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build locations list
+  set_fact:
+    _locations: "{{ _locations | default([]) + [ _r.name ] }}"
+  loop: '{{ _subnet.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build domains list
+  set_fact:
+    _domains: "{{ _domains | default([]) + [ _r.name ] }}"
+  loop: '{{ _subnet.domains | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Create/Update Subnets
+  theforeman.foreman.subnet:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    name: '{{ _subnet.name }}'
+    boot_mode:  '{{ _subnet.boot_mode | default(omit) }}'  
+    cidr: '{{ _subnet.cidr | default(omit)}}' 
+    description: '{{ _subnet.description | default(omit)}}' 
+    dns_primary: '{{ _subnet.dns_primary | default(omit) }}'
+    dns_secondary: '{{ _subnet.dns_secondary | default(omit) }}'
+    gateway: '{{ _subnet.gateway | default(omit) }}'
+    ipam: '{{ _subnet.ipam | default(omit) }}'
+    mask: '{{ _subnet.mask | default(omit) }}'
+    mtu: '{{ _subnet.mtu | default(omit) }}'
+    network: '{{ _subnet.network }}'
+    network_type: '{{ _subnet.network_type | default(omit) }}'
+    vlanid: '{{ _subnet.vlanid | int | default(omit) }}'
+    locations: '{{ _locations }}'
+    domains: '{{ _domains }}'
+    dhcp_proxy: '{{ _subnet.dhcp | default(omit) }}'
+    discovery_proxy: '{{ _subnet.discovery | default(omit) }}'
+    dns_proxy: '{{ _subnet.dns | default(omit) }}'
+    from_ip: '{{ _subnet.from | default(omit) }}'
+    to_ip: '{{ _subnet.to | default(omit) }}'
+    httpboot_proxy: '{{ _subnet.httpboot | default(omit) }}'
+    template_proxy: '{{ _subnet.template | default(omit) }}'
+    tftp _proxy: '{{ _subnet.tftp | default(omit) }}'x
