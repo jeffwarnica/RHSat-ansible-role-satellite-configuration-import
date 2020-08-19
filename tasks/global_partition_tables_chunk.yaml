@@ -1,0 +1,56 @@
+- name: 'Working on partition_tables yaml {{ _partition_tables_file }}'
+  include_vars:
+    file: '{{ _partition_tables_file }}'
+    name: _partition_table
+
+- name: Debug out _partition_table
+  debug:
+    var: _partition_table
+    verbosity: 1
+
+- name: Add to global partition_tables dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    partition_tables: "{{ partition_tables | default([]) | combine({_partition_table.id: _partition_table}) }}"
+    _orgs: []
+    _locations: []
+
+- name: Debug out partition_tables
+  debug:
+    var: partition_tables
+    verbosity: 2
+
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _partition_table.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _partition_table.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+     
+- name: Create/Update Partition Tables 
+  theforeman.foreman.partition_table:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    name: '{{ _partition_table.name }}'
+    locked: '{{ _partition_table.locked | default(omit) }}'
+    os_family: '{{ _partition_table.os_family | default(omit) }}'
+    file_name: '{{ _partition_table.file_name | default(omit) }}'
+    layout: '{{ _partition_table.layout | default(omit) }}'
+    locations: '{{ _locations }}' 
+
+
