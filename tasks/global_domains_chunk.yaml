@@ -15,6 +15,11 @@
     _orgs: []
     _locations: []
 
+- name: Debug out domains
+  debug:
+    var: domains
+    verbosity: 2
+
 - name: Build orgs list
   set_fact: 
     _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
@@ -34,11 +39,6 @@
   loop_control:
     loop_var: _r
      
-- name: Debug out domains
-  debug:
-    var: domains
-    verbosity: 2
-
 - name: Create/Update Domains 
   theforeman.foreman.domain:
     username: '{{ satellite_api_username }}'
