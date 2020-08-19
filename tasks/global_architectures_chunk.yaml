@@ -21,7 +21,7 @@
 
 - name: Build operatingsystems list
   set_fact: 
-    _operatingsystems: "{{ _operatingsystems | default([]) + [ _r.name ] }}"
+    _operatingsystems: "{{ _operatingsystems | default([]) + [ _r.title ] }}"
   loop: '{{ _architecture.operatingsystems | default([]) }}'
   loop_control:
     loop_var: _r
