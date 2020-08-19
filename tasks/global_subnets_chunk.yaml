@@ -23,14 +23,14 @@
 
 - name: Build orgs list
   set_fact:
-    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+    _orgs: "{{ _orgs | default([]) + [ _r.title] }}"
   loop: '{{ _subnet.organizations | default([]) }}'
   loop_control:
     loop_var: _r
 
 - name: Build locations list
   set_fact:
-    _locations: "{{ _locations | default([]) + [ _r.name ] }}"
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
   loop: '{{ _subnet.locations | default([]) }}'
   loop_control:
     loop_var: _r
