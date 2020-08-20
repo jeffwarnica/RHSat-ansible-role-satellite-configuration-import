@@ -1,0 +1,28 @@
+- name: 'Working on setting yaml {{ _setting_file }}'
+  include_vars:
+    file: '{{ _settings_file }}'
+    name: _setting
+
+- name: Debug out _setting
+  debug:
+    var: _setting
+    verbosity: 1
+
+- name: Add to global settings dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    settings: "{{ settings | default([]) | combine({_setting.id: _setting}) }}"
+
+- name: Debug out settings
+  debug:
+    var: settings
+    verbosity: 1
+
+- name: 'Create/Update Setting'
+  theforeman.foreman.setting:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    name: '{{ _setting.name }}'
+    value: '{{ _setting.value }}'
+    

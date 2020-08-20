@@ -11,7 +11,7 @@
 - name: Add to global sync_plan dict
   set_fact:
                # products dict, or empty dict, plus new k/v 
-    products: "{{ sync_plans | default([]) | combine({_sync_plan.id: _sync_plan}) }}"
+    sync_plans: "{{ sync_plans | default([]) | combine({_sync_plan.id: _sync_plan}) }}"
 
 - name: Debug out sync_plans
   debug:
