@@ -48,7 +48,7 @@
     organizations: '{{ _orgs }}'
     name: '{{ _domain.name }}'
     description: '{{ _domain.fullname | default(omit) }}'
-    #dns_proxy: '{{ _domain.dns | default(None) }}'
+    dns_proxy: '{{ _domain.dns | default(omit, True) }}'
     locations: '{{ _locations }}' 
 
 

@@ -1,0 +1,69 @@
+- name: 'Working on users yaml {{ _users_file }}'
+  include_vars:
+    file: '{{ _users_file }}'
+    name: _user
+
+- name: Debug out _user
+  debug:
+    var: _user
+    verbosity: 1
+
+- name: Add to global users dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    users: "{{ users | default([]) | combine({_user.id: _user}) }}"
+    _orgs: []
+    _locations: []
+    _roles: []
+
+- name: Debug out users
+  debug:
+    var: users
+    verbosity: 2
+
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.title ] }}"
+  loop: '{{ _user.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _user.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build roles list
+  set_fact: 
+    _roles: "{{ _roles| default([]) + [ _r.name ] }}"
+  loop: '{{ _user.roles | default([]) }}'
+  loop_control:
+    loop_var: _r
+     
+- name: Create/Update Users  
+  theforeman.foreman.user:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    description: '{{ _user.description | default(omit) }}'
+    admin: '{{ _user.admin | default(omit) }}'
+    auth_source: '{{ _user.auth_source_name | default(omit) }}'
+    firstname: '{{ _user.firstname | default(omit) }}'
+    lastname: '{{ _user.lastname | default(omit) }}'
+    locale: '{{ _user.locale | default(omit, True) }}'
+    login: '{{ _user.login }}'
+    default_location: '{{ _user.default_location.title | default(omit) }}'
+    default_organization: '{{ _user.default_organization.title | default(omit) }}'
+    locations: '{{ _locations }}'
+    mail: '{{ _user.mail | default(omit) }}'
+    timezone: '{{ _user.timezone | default(omit, True) }}'
+    roles: '{{ _roles }}'

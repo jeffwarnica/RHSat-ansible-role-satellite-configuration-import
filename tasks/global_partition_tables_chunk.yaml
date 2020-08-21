@@ -49,8 +49,8 @@
     name: '{{ _partition_table.name }}'
     locked: '{{ _partition_table.locked | default(omit) }}'
     os_family: '{{ _partition_table.os_family | default(omit) }}'
-    file_name: '{{ _partition_table.file_name | default(omit) }}'
-    layout: '{{ _partition_table.layout | default(omit) }}'
+    file_name: '{{ _partition_table.file_name | default(omit, True) }}'
+    layout: '{{ _partition_table.layout | default(omit, True) }}'
     locations: '{{ _locations }}' 
 
 
