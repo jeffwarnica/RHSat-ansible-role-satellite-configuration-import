@@ -1,0 +1,93 @@
+- name: 'Working on operatingsystems yaml {{ _operatingsystems_file }}'
+  include_vars:
+    file: '{{ _operatingsystems_file }}'
+    name: _operatingsystem
+
+- name: Debug out _operatingsystem
+  debug:
+    var: _operatingsystem
+    verbosity: 1
+
+- name: Add to global operatingsystems dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    operatingsystems: "{{ operatingsystems | default([]) | combine({_operatingsystem.id: _operatingsystem}) }}"
+    _architectures: []
+    _provisioning_templates: []
+    _ptables: []
+    _media: []
+
+- name: Debug out operatingsystems
+  debug:
+    var: operatingsystems
+    verbosity: 2
+
+- name: Build architectures list
+  set_fact: 
+    _architectures: "{{ _architectures | default([]) + [ _r.name ] }}"
+  loop: '{{ _operatingsystem.architectures | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out architectures
+  debug:
+    var: _architectures
+    verbosity: 2
+
+- name: Build _provisioning_templates list
+  set_fact: 
+    _provisioning_templates: "{{ _provisioning_templates | default([]) + [ _r.name] }}"
+  loop: '{{ _operatingsystem.provisioning_templates | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build ptables list
+  set_fact: 
+    _ptables: "{{ _ptables | default([]) + [ _r.name ] }}"
+  loop: '{{ _operatingsystem.ptables | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build media list
+  set_fact: 
+    _media: "{{ _media | default([]) + [ _r.name ] }}"
+  loop: '{{ _operatingsystem.media | default([]) }}'
+  loop_control:
+    loop_var: _r
+     
+- name: Create/Update Operating Systems  
+  theforeman.foreman.operatingsystem:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    architectures: '{{ _architectures }}'
+    name: '{{ _operatingsystem.name }}'
+    description: '{{ _operatingsystem.description | default(omit) }}'
+    major: '{{ _operatingsystem.major | default(omit) }}'
+    ptables: '{{ _ptables }}' 
+    minor: '{{ _operatingsystem.minor | default(omit) }}'
+    #os_family: '{{ _operatingsystem.family if _operatingsystem.family != " " else "Redhat" }}'
+    os_family: "Redhat"
+    provisioning_templates: '{{ _provisioning_templates }}'
+    password_hash: '{{ _operatingsystem.password_hash | default(omit) }}'
+    release_name: '{{ _operatingsystem.release_name | default(omit) }}'
+    media: '{{ _media }}'
+
+- name: Debug out default templates
+  debug:
+    var: '{{ _operatingsystem.os_default_templates }}'
+    verbosity: 2 
+
+- name: Create/Update OS Default Templates
+  theforeman.foreman.os_default_template: 
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    operatingsystem: '{{ _os_default_template.operatingsystem_name }}'
+    template_kind: '{{ _os_default_template.template_kind_name }}'
+    provisioning_template: '{{ _os_default_template.provisioning_template_name }}'
+  loop: '{{ _operatingsystem.os_default_templates | default([]) }}'
+  loop_control:
+    loop_var: _os_default_template 
