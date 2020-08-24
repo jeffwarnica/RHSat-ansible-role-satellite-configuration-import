@@ -29,10 +29,6 @@
   loop_control:
     loop_var: _r
      
-- name: Debug out domains
-  debug:
-    var: domains
-    verbosity: 2
 
 - name: Create/Update Domains 
   theforeman.foreman.domain:
@@ -43,7 +39,6 @@
     organizations: '{{ _orgs }}'
     name: '{{ _domain.name }}'
     description: '{{ _domain.fullname | default(omit) }}'
-    #dns_proxy: '{{ _domain.dns | default(omit) }}'
+#    dns_proxy: "wtf" #'{{ _domain.dns | "wtf" }}'
     locations: '{{ _locations }}' 
-
 

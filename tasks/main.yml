@@ -15,8 +15,8 @@
     cd repo
     git checkout {{ import_git_branch }}
 
-- name: Global context
-  import_tasks: global.yml
+- name: Global context (early)
+  import_tasks: global_early.yml
 
 - name: Organizations context
   import_tasks: organizations.yaml
@@ -27,6 +27,9 @@
     - '{{ git_root_dir.path }}/repo/managed/global/compute_profiles/*.yaml'
   loop_control:
     loop_var: _compute_profiles_file
+
+#- name: Global context (late)
+#  import_tasks: global_late.yml
 
 - name: Cleanup tmp location
   file:

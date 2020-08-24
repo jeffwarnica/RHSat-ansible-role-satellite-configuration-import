@@ -10,13 +10,12 @@
 
 - name: Add to global product dict
   set_fact:
-               # products dict, or empty dict, plus new k/v 
     products: "{{products | default([]) | combine({_product.id: _product}) }}"
 
 - name: Debug out products
   debug:
     var: products
-    verbosity: 1
+    verbosity: 3
 
 - name: 'Create/Update product id {{ _product.id }} / {{ _product.name }}'
   theforeman.foreman.product:

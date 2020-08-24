@@ -7,12 +7,15 @@
 - name: Reset _repos
   set_fact:
     _repos: []
+
 - name: Build Repositories
   set_fact:
     _repos: "{{ _repos + [{'name': _r.name, 'product': repositories_by_name[_r.name].product.name}]  }}"
   loop: '{{ _cv.value.repositories }}'
   loop_control:
     loop_var: _r
+
+
 - name: out _r 
   debug:
     msg: "_repos as yaml looks like: [[ {{ _repos|to_nice_yaml }} ]]"
@@ -60,4 +63,33 @@
 #      repositories: '{{ _repos | default(omit) }}'
       components: '{{ _components }}'
   when:  _cv.value.name != "Default Organization View" and _cv.value.composite
+
+
+### Deal with CV Filters
+
+- name: Reset _this_cv_filters
+  set_fact:
+    _this_cv_filters: []
+
+- name: Build _this_cv_filters
+  set_fact:
+    _this_cv_filters: "{{ _this_cv_filters + [ _l.value.id ] }}"
+  when: _l.value.content_view.id == _cv.value.id
+  loop: "{{ content_view_filters | dict2items }}"
+  loop_control:
+    loop_var: _l 
+
+- name: Debug out _this_cv_filters
+  debug:
+    var: _this_cv_filters
+
+
+- name: "Processing each filter, by id: [ {{ _this_cv_filters }} ]"
+  include_tasks: org_content_view_filter_rule_chunk.yaml
+  loop: "{{ _this_cv_filters }}"
+  loop_control:
+    loop_var: _f_id 
+
+- fail:
+  when: _this_cv_filters|length>0
 

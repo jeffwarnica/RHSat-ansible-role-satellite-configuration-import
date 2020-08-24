@@ -77,11 +77,6 @@
 - name: Process content views
   include_tasks: org_content_views.yaml
 
-- fail:
-
-
-
-
 - name: Process each domain yaml
   include_tasks: org_domains_chunk.yaml
   with_fileglob:

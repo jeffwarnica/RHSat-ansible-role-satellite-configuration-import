@@ -42,7 +42,8 @@
   loop_control:
     loop_var: _r
 
-- name: Create/Update Subnets
+#- fail:
+- name: "Create/Update Subnet [{{ _subnet.name }}]"
   theforeman.foreman.subnet:
     username: '{{ satellite_api_username }}'
     password: '{{ satellite_api_password }}' 
@@ -64,11 +65,12 @@
     vlanid: '{{ _subnet.vlanid | int | default(omit) }}'
     locations: '{{ _locations }}'
     domains: '{{ _domains }}'
-    dhcp_proxy: '{{ _subnet.dhcp | default(omit) }}'
-    discovery_proxy: '{{ _subnet.discovery | default(omit) }}'
-    dns_proxy: '{{ _subnet.dns | default(omit) }}'
-    from_ip: '{{ _subnet.from | default(omit) }}'
-    to_ip: '{{ _subnet.to | default(omit) }}'
-    httpboot_proxy: '{{ _subnet.httpboot | default(omit) }}'
-    template_proxy: '{{ _subnet.template | default(omit) }}'
-    tftp _proxy: '{{ _subnet.tftp | default(omit) }}'x
+#    dhcp_proxy: '{{ _subnet.dhcp | default(omit) }}' #_subnet.dhcp if _subnet.dhcp != "" else omit }}
+#    discovery_proxy: '{{ _subnet.discovery | default(omit) }}'
+#    dns_proxy: '{{ _subnet.dns | default(omit) }}'
+#    from_ip: '{{ _subnet.from | default(omit) }}'
+#    to_ip: '{{ _subnet.to | default(omit) }}'
+#    httpboot_proxy: '{{ _subnet.httpboot | default(omit) }}'
+#    template_proxy: '{{ _subnet.template if _subnet.template != "" else omit }}'
+#    tftp_proxy: '{{ _subnet.tftp | default(omit) }}'
+#
