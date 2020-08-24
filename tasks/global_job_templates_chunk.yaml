@@ -1,0 +1,78 @@
+##############
+## Job tempaltes require two special considerations
+#
+# First the job template itself is potetially ansible YAML, retreived with {{ jinja opening thingies.
+# And you can't tell Ansible to not interpolate some _deep_ element, its all or nothing.
+# So we load in the file as text, replace {{ with @@, save that out as a temporary file, and process
+# that as YAML, into a var, per norm.
+#
+# Second, the templte "inputs" structure has a bunch of optional elements. We cant use
+# the magic 'omit' feature as we need to create a dictionary of them.
+#
+# So that indicates the very magical thing of building a YAML from template/job_template_inputs.j2
+#   into _inputs. (which itself might be empty and omit-ted.
+
+- name: Load raw YAML as string because jinja
+  set_fact: 
+    _jt_raw: '{{ lookup("file", _job_template_file) }}'
+
+- name: Escape jt_raw
+  set_fact:
+    _jt_raw_escaped: "{{ _jt_raw  | regex_replace('{{', '@@') }}"
+
+- name: Create temporary file
+  tempfile:
+    state: file
+  register: _tmp_jtf
+
+- name: Populate temporary file
+  copy: 
+    dest: "{{ _tmp_jtf.path }}"
+    content: "{{ _jt_raw_escaped }}"
+
+- name: 'Working on Processed Job Template yaml {{ _tmp_jtf.path}}'
+  include_vars:
+    file: '{{ _tmp_jtf.path }}'
+    name: _jt
+
+- name: Rest _orgs and _locations and _inputs
+  set_fact:
+    _orgs: []
+    _locations: []
+    _inputs: []
+
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _jt.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _jt.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build _inputs by executing jinja2 template
+  set_fact:
+    _inputs: "{{ lookup('template', 'job_template_inputs.j2') | from_yaml }}"
+
+- name: Create/Update Job Templates
+  theforeman.foreman.job_template:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}' 
+    name: '{{ _jt.name }}'
+    description_format: '{{ _jt.description_format | default(omit) }}'
+    job_category: '{{ _jt.job.category | default(omit) }}'
+    locked: '{{ _jt.locked }}'
+    provider_type: '{{ _jt.provider_type }}'
+    snippet: '{{ _jt.snippet }}'
+    template: '{{ _jt.template | regex_replace("@@", "{{") }}'
+    template_inputs: '{{ _inputs if _inputs else omit }}'
+

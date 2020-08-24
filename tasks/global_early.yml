@@ -1,0 +1,36 @@
+- name: Reset per org variables
+  set_fact:
+    repositories_by_name: []
+
+- name: Process each location yamls
+  include_tasks: global_location_read.yml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/locations/*yaml'
+
+- name: Top down, import per depth
+  include_tasks: global_location_per_depth.yml
+  loop: "{{locations.keys()|sort }}" 
+  when: false
+
+- name: Process each domain yaml
+  include_tasks: global_domains_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/domains/*.yaml'
+  loop_control:
+    loop_var: _domains_file
+
+- name: Process each job_template yaml
+  include_tasks: global_job_templates_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/job_templates/*.yaml'
+  loop_control:
+    loop_var: _job_template_file
+
+- fail:
+
+- name: Process each compute profile yaml
+  include_tasks: global_compute_profiles_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/compute_profiles/*.yaml'
+  loop_control:
+    loop_var: _compute_profiles_file 

@@ -1,0 +1,28 @@
+- name: 'Working on repo yaml {{ _repo_file }}'
+  include_vars:
+    file: '{{ _repo_file }}'
+    name: _repo
+
+- name: Debug out _repo
+  debug:
+    var: _repo
+    verbosity: 1
+
+- name: Store repositories for later
+  set_fact:
+    repositories_by_name: "{{ repositories_by_name | default([]) | combine({ _repo.name: _repo}) }}"
+
+- name: "Create repository: [{{_repo.product.name}}]"
+  theforeman.foreman.repository:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    name: '{{ _repo.name }} IMPRTED!!!'
+    content_type: '{{ _repo.content_type }}'
+    product: '{{ _repo.product.name }}' #Not the whole structure!
+    organization: '{{ _org.name }}'
+    url: '{{ _repo.url }}'
+    download_policy: '{{ _repo.download_policy }}'
+  when: _repo.product is defined and not _repo.product.redhat
+

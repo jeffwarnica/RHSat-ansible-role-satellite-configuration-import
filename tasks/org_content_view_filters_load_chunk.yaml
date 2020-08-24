@@ -1,0 +1,13 @@
+- name: 'Working on CV Filter {{ _cv_filter_file }}'
+  include_vars:
+    file: '{{ _cv_filter_file }}'
+    name: _cv_f
+
+- name: Debug out _cv_f
+  debug:
+    var: _cv_f
+    verbosity: 1
+
+- name: Add to global content_view_filters dict
+  set_fact:
+    content_view_filters: "{{ content_view_filters |combine ({_cv_f.id: _cv_f}) }}"
