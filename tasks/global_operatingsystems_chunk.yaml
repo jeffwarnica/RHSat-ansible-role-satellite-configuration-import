@@ -63,15 +63,15 @@
     state: present
     architectures: '{{ _architectures }}'
     name: '{{ _operatingsystem.name }}'
-    description: '{{ _operatingsystem.description | default(omit) }}'
-    major: '{{ _operatingsystem.major | default(omit) }}'
+    description: '{{ _operatingsystem.description | default(omit, True) }}'
+    major: '{{ _operatingsystem.major | default(omit, True) }}'
     ptables: '{{ _ptables }}' 
-    minor: '{{ _operatingsystem.minor | default(omit) }}'
-    #os_family: '{{ _operatingsystem.family if _operatingsystem.family != " " else "Redhat" }}'
-    os_family: "Redhat"
+    minor: '{{ _operatingsystem.minor | default(omit, True) }}'
+    os_family: '{{ _operatingsystem.family | default(omit, True) }}' #there is an issue if family attribute is blank in export
+    #os_family: "Redhat" 
     provisioning_templates: '{{ _provisioning_templates }}'
-    password_hash: '{{ _operatingsystem.password_hash | default(omit) }}'
-    release_name: '{{ _operatingsystem.release_name | default(omit) }}'
+    password_hash: '{{ _operatingsystem.password_hash | default(omit, True) }}'
+    release_name: '{{ _operatingsystem.release_name | default(omit, True) }}'
     media: '{{ _media }}'
 
 - name: Debug out default templates
