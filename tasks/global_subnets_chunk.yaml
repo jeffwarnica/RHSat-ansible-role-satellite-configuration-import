@@ -42,7 +42,8 @@
   loop_control:
     loop_var: _r
 
-- name: Create/Update Subnets
+#- fail:
+- name: "Create/Update Subnet [{{ _subnet.name }}]"
   theforeman.foreman.subnet:
     username: '{{ satellite_api_username }}'
     password: '{{ satellite_api_password }}' 

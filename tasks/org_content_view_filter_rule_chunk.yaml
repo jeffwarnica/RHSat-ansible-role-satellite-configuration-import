@@ -1,0 +1,37 @@
+- name: Set _filter
+  set_fact:
+    _filter: "{{ content_view_filters[_f_id] }}"
+
+- name: Debug out _this_cv_filters
+  debug:
+    var: _this_cv_filters
+
+- name: "Adding filter id: [ {{ _this_cv_filters }} ], rule ID [{{ _rule.id }}]"
+  theforeman.foreman.content_view_filter:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    filter_state: present
+    organization: '{{ _org.name }}'
+    name: '{{ _filter.name }}'
+    filter_type: '{{ _filter.type }}'
+    inclusion: '{{ _filter.inclusion }}'
+    architecture: '{{ _filter.architecture | default(omit) }}'
+    content_view: '{{ _cv.value.name }}'
+    date_type: '{{ omit if _filter.type != "erratum" else _rule.date_type }}'
+    description: '{{  _filter.description }}'
+        #TODO: We only support 1 rule?
+        #        so dates OK, but  listing errata by ID not??
+        #        module limitation
+    end_date:  '{{ omit if _filter.type != "erratum" else _rule.end_date }}'
+    start_date:  '{{ omit if _filter.type != "erratum" else _rule.start_date }}'
+    errata_id: '{{ omit if _filter.type != "erratum" else _rule.errata_id}}'
+    max_version: '{{ omit if _filter.type != "rpm" else _rule.max_version | default(omit) }}'
+    min_version: '{{ omit if _filter.type != "rpm" else _rule.min_version | default(omit) }}'
+    rule_name: '{{ _rule.uuid | default(omit) }}'
+  loop: "{{ _filter.rules }}"
+  loop_control:
+    loop_var: _rule
+
+
+
