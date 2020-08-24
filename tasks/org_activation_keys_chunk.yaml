@@ -61,5 +61,5 @@
     service_level: '{{ _activation_key.service_level | default(omit, True) }}'
     unlimited_hosts: '{{ _activation_key.unlimited_hosts | default(omit, True) }}'
     host_collections: '{{ _host_collections }}'
-    #subscriptions: '{{ _products }}'
+    subscriptions: '{{ _products }}'
   

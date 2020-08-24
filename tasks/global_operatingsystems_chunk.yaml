@@ -76,7 +76,7 @@
 
 - name: Debug out default templates
   debug:
-    var: '{{ _operatingsystem.os_default_templates }}'
+    var:  _operatingsystem.os_default_templates
     verbosity: 2 
 
 - name: Create/Update OS Default Templates
