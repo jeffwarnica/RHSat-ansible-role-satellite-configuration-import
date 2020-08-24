@@ -19,14 +19,19 @@
   loop_control:
     loop_var: _domains_file
 
+- name: Process each operatingsystems yaml
+  include_tasks: global_operatingsystems_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/operatingsystems/*.yaml'
+  loop_control:
+    loop_var: _operatingsystems_file
+
 - name: Process each job_template yaml
   include_tasks: global_job_templates_chunk.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/global/job_templates/*.yaml'
   loop_control:
     loop_var: _job_template_file
-
-- fail:
 
 - name: Process each compute profile yaml
   include_tasks: global_compute_profiles_chunk.yaml
@@ -77,9 +82,4 @@
   loop_control:
     loop_var: _provisioning_templates_file 
 
-- name: Process each operatingsystems yaml
-  include_tasks: global_operatingsystems_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global/operatingsystems/*.yaml'
-  loop_control:
-    loop_var: _operatingsystems_file 
+

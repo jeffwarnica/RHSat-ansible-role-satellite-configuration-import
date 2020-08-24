@@ -90,6 +90,3 @@
   loop_control:
     loop_var: _f_id 
 
-- fail:
-  when: _this_cv_filters|length>0
-
