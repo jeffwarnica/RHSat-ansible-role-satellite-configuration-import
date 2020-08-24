@@ -1,0 +1,67 @@
+- name: 'Working on provisioning_templates yaml {{ _provisioning_templates_file }}'
+  include_vars:
+    file: '{{ _provisioning_templates_file }}'
+    name: _provisioning_template
+
+- name: Debug out _provisioning_template
+  debug:
+    var: _provisioning_template
+    verbosity: 1
+
+- name: Add to global provisioning_templates dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    provisioning_templates: "{{ provisioning_templates | default([]) | combine({_provisioning_template.id: _provisioning_template}) }}"
+    _orgs: []
+    _locations: []
+    _operatingsystems: []
+
+- name: Debug out provisioning_templates
+  debug:
+    var: provisioning_templates
+    verbosity: 2
+
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _provisioning_template.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _provisioning_template.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build operatingsystems list
+  set_fact: 
+    _operatingsystems: "{{ _operatingsystems | default([]) + [ _r.title ] }}"
+  loop: '{{ _provisioning_template.operatingsytems | default([]) }}'
+  loop_control:
+    loop_var: _r
+     
+- name: Create/Update Provisioning Templates 
+  theforeman.foreman.provisioning_template:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    name: '{{ _provisioning_template.name }}'
+    file_name: '{{ _provisioning_template.file_name | default(omit, True) }}'
+    template: '{{ _provisioning_template.template | default(omit, True) }}'
+    locations: '{{ _locations }}' 
+    audit_comment: '{{ _provisioning_template.audit_comment | default(omit) }}'
+    kind: '{{ _provisioning_template.template_kind_name | default(omit, True) }}'
+    locked: '{{ _provisioning_template.locked | default(omit) }}'
+    operatingsystems: '{{ _operatingsystems }}'
+  #Not importing Bootdisk, kexec and cloud-init type templates because bug in the foreman modules does not accept then. BZ is filed.
+  when:  _provisioning_template.template_kind_name not in ['Bootdisk','kexec','cloud-init']
+

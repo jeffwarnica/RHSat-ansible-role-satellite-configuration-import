@@ -23,14 +23,14 @@
 
 - name: Build orgs list
   set_fact:
-    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+    _orgs: "{{ _orgs | default([]) + [ _r.title] }}"
   loop: '{{ _subnet.organizations | default([]) }}'
   loop_control:
     loop_var: _r
 
 - name: Build locations list
   set_fact:
-    _locations: "{{ _locations | default([]) + [ _r.name ] }}"
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
   loop: '{{ _subnet.locations | default([]) }}'
   loop_control:
     loop_var: _r
@@ -65,12 +65,11 @@
     vlanid: '{{ _subnet.vlanid | int | default(omit) }}'
     locations: '{{ _locations }}'
     domains: '{{ _domains }}'
-#    dhcp_proxy: '{{ _subnet.dhcp | default(omit) }}' #_subnet.dhcp if _subnet.dhcp != "" else omit }}
-#    discovery_proxy: '{{ _subnet.discovery | default(omit) }}'
-#    dns_proxy: '{{ _subnet.dns | default(omit) }}'
-#    from_ip: '{{ _subnet.from | default(omit) }}'
-#    to_ip: '{{ _subnet.to | default(omit) }}'
-#    httpboot_proxy: '{{ _subnet.httpboot | default(omit) }}'
-#    template_proxy: '{{ _subnet.template if _subnet.template != "" else omit }}'
-#    tftp_proxy: '{{ _subnet.tftp | default(omit) }}'
-#
+    dhcp_proxy: '{{ _subnet.dhcp | default(omit, True) }}'
+    discovery_proxy: '{{ _subnet.discovery | default(omit, True) }}'
+    dns_proxy: '{{ _subnet.dns | default(omit, True) }}'
+    from_ip: '{{ _subnet.from | default(omit) }}'
+    to_ip: '{{ _subnet.to | default(omit) }}'
+    httpboot_proxy: '{{ _subnet.httpboot | default(omit, True) }}'
+    template_proxy: '{{ _subnet.template | default(omit, True) }}'
+    tftp_proxy: '{{ _subnet.tftp | default(omit, True) }}'

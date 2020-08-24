@@ -1,0 +1,41 @@
+- name: 'Working on architectures yaml {{ _architectures_file }}'
+  include_vars:
+    file: '{{ _architectures_file }}'
+    name: _architecture
+
+- name: Debug out _architecture
+  debug:
+    var: _architecture
+    verbosity: 1
+
+- name: Add to global architectures dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    architectures: "{{ architectures | default([]) | combine({_architecture.id: _architecture}) }}"
+    _operatingsystems: []
+
+- name: Debug out architectures
+  debug:
+    var: architectures
+    verbosity: 2
+
+- name: Build operatingsystems list
+  set_fact: 
+    _operatingsystems: "{{ _operatingsystems | default([]) + [ _r.title ] }}"
+  loop: '{{ _architecture.operatingsystems | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out operatingsystems
+  debug:
+    var: _operatingsystems
+    verbosity: 2
+
+- name: Create/Update Architectures
+  theforeman.foreman.architecture:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    operatingsystems: '{{ _operatingsystems }}'
+    name: '{{ _architecture.name }}'

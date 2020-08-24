@@ -42,7 +42,6 @@
       name: '{{ _org.name }}'
       description: '{{ _org.description }}'
 
-
 - name: Handle Lifecycle Environments
   include_tasks: org_environment.yaml
 
@@ -97,5 +96,12 @@
     - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/host_collections/*.yaml'
   loop_control:
     loop_var: _host_collections_file
+
+- name: Process each activation_key yaml
+  include_tasks: org_activation_keys_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/activation_keys/*.yaml'
+  loop_control:
+    loop_var: _activation_keys_file
 
 

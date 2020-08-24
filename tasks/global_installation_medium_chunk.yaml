@@ -1,0 +1,68 @@
+- name: 'Working on installation_medium yaml {{ _installation_medium_file }}'
+  include_vars:
+    file: '{{ _installation_medium_file }}'
+    name: _installation_media
+
+- name: Debug out _installation_media
+  debug:
+    var: _installation_media
+    verbosity: 1
+
+- name: Add to global installation_medium dict
+  set_fact:
+               # products dict, or empty dict, plus new k/v 
+    installation_medium: "{{ installation_medium | default([]) | combine({_installation_media.id: _installation_media}) }}"
+    _orgs: []
+    _locations: []
+    _operatingsystems: []
+
+- name: Debug out installation_medium
+  debug:
+    var: installation_medium
+    verbosity: 2
+
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.name ] }}"
+  loop: '{{ _installation_media.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _installation_media.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Build operatingsystems list
+  set_fact: 
+    _operatingsystems: "{{ _operatingsystems | default([]) + [ _r.title ] }}"
+  loop: '{{ _architecture.operatingsystems | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out operatingsystems
+  debug:
+    var: _operatingsystems
+    verbosity: 2
+     
+- name: Create/Update Installation Medium 
+  theforeman.foreman.installation_medium:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    name: '{{ _installation_media.name }}'
+    path: '{{ _installation_media.path | default(omit) }}'
+    os_family: '{{ _installation_media.os_family | default(omit) }}'
+    operatingsystems: '{{ _operatingsystems }}'
+    locations: '{{ _locations }}' 
+
+
