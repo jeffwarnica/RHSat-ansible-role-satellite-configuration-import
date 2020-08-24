@@ -58,9 +58,9 @@
     file_name: '{{ _provisioning_template.file_name | default(omit, True) }}'
     template: '{{ _provisioning_template.template | default(omit, True) }}'
     locations: '{{ _locations }}' 
-    audit_comment: '{{ _provisioning_template.audit_comment | default(omit) }}'
+    audit_comment: '{{ _provisioning_template.audit_comment | default(omit, True) }}'
     kind: '{{ _provisioning_template.template_kind_name | default(omit, True) }}'
-    locked: '{{ _provisioning_template.locked | default(omit) }}'
+    locked: '{{ _provisioning_template.locked | default(omit, True) }}'
     operatingsystems: '{{ _operatingsystems }}'
   #Not importing Bootdisk, kexec and cloud-init type templates because bug in the foreman modules does not accept then. BZ is filed.
   when:  _provisioning_template.template_kind_name not in ['Bootdisk','kexec','cloud-init']
