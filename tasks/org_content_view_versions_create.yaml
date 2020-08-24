@@ -1,0 +1,30 @@
+
+- name: Set some local data
+  set_fact:
+    _cvv: "{{ content_view_versions[_cvv_id] }}"
+    _lces: []
+- name: "Working on CVV [{{ _cvv.name }}]"
+  debug:
+    msg: "_cvv is: [[[ {{ _cvv }}}]"
+    verbosity: 1
+
+- name: Build _lce
+  set_fact:
+    _lces: "{{_lces + [ _lce.name ]}}"
+  loop: "{{ _cvv.environments }}"
+  loop_control:
+    loop_var: _lce
+
+- name: "Creating CVV"
+  theforeman.foreman.content_view_version:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}'
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organization: '{{ _org.name }}'
+    content_view: '{{ _cv.value.name }}'
+    lifecycle_environments: '{{ _lces }}' #'{{ _cvv.value.environments | json_query("[*].id") }}'
+#    name: '{{ _cv.value.name }}'
+    version: '{{ _cvv.version }}'
+    description: '{{ _cvv.description }}'
+  when:  _cv.value.name != "Default Organization View" #and not _cv.value.composite

@@ -1,3 +1,7 @@
+- name: Reset per org variables
+  set_fact:
+    repositories_by_name: []
+
 - name: Process each location yamls
   include_tasks: global_location_read.yml
   with_fileglob:
@@ -15,12 +19,14 @@
   loop_control:
     loop_var: _domains_file
 
-- name: Process each subnets yaml
-  include_tasks: global_subnets_chunk.yaml
+- name: Process each job_template yaml
+  include_tasks: global_job_templates_chunk.yaml
   with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global/subnets/*.yaml'
+    - '{{ git_root_dir.path }}/repo/managed/global/job_templates/*.yaml'
   loop_control:
-    loop_var: _subnets_file
+    loop_var: _job_template_file
+
+- fail:
 
 - name: Process each compute profile yaml
   include_tasks: global_compute_profiles_chunk.yaml

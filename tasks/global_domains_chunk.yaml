@@ -51,4 +51,3 @@
     dns_proxy: '{{ _domain.dns | default(omit, True) }}'
     locations: '{{ _locations }}' 
 
-

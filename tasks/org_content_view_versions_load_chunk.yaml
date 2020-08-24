@@ -1,0 +1,13 @@
+- name: 'Working on CV Version {{ _cv_version_file }}'
+  include_vars:
+    file: '{{ _cv_version_file }}'
+    name: _cv_v
+
+- name: Debug out _cv_v
+  debug:
+    var: _cv_v
+    verbosity: 1
+
+- name: Add to global cv_versions dict
+  set_fact:
+    content_view_versions: "{{ content_view_versions |combine ({_cv_v.id: _cv_v}) }}"
