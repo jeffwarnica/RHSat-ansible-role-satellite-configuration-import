@@ -8,7 +8,11 @@ Limitations
 
 While "import everything" is a nice tagline, this role does not accomplish it. There are various "install time" settings which are better configured with an install time playbook (it possibly using the same underlying foreman-ansible-modules), suitably wrapped with restart scripts and OS level configurations.
 
-This does not manage actual content. The actual content of *content views* can not be "synced", with this tooling.
+This does not manage actual content. The actual content of *content views* can not be "synced" with this tooling.
+
+Renamed/Deleted elements:
+
+No consideration is placed on the possibility of elements being deleted, or renamed. The import process into a system for unmanged artiofacts is unexplored.
 
 Content Views:
 
