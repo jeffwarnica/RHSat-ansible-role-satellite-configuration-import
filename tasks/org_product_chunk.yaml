@@ -25,12 +25,12 @@
     state: present
     organization: '{{ _org.name }}'
     name: '{{ _product.name }}'
-    sync_plan: '{{ _product.sync_plan.name| default(omit) }}'
+    sync_plan: '{{ _product.sync_plan.name| default(omit, True) }}'
     description: '{{ _product.description }}'
-    gpg_key: '{{ _product.gpg_key.name | default(omit) }}' 
-    ssl_ca_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit) }}'
-    ssl_client_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit)}}' 
-    ssl_client_key: '{{ content_credentials[_product.ssl_client_key_id] | default(omit)}}'
+    gpg_key: '{{ _product.gpg_key.name | default(omit, True) }}' 
+    ssl_ca_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit, True) }}'
+    ssl_client_cert: '{{ content_credentials[_product.ssl_client_cert_id] | default(omit, True)}}' 
+    ssl_client_key: '{{ content_credentials[_product.ssl_client_key_id] | default(omit, True)}}'
   when:
     - _product.provider is defined and _product.provider.name != "Red Hat"
 

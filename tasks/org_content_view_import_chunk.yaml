@@ -30,8 +30,8 @@
     organization: '{{ _org.name }}'
     name: '{{ _cv.value.name }}'
     composite: false
-    description: '{{ _cv.value.description | default(omit) }}'
-    repositories: '{{ _repos | default(omit) }}'
+    description: '{{ _cv.value.description | default(omit, True) }}'
+    repositories: '{{ _repos | default(omit, True) }}'
   ignore_errors: true
   when:  _cv.value.name != "Default Organization View" and not _cv.value.composite
 
@@ -60,7 +60,7 @@
       organization: '{{ _org.name }}'
       name: '{{ _cv.value.name }}'
       composite: true
-      description: '{{ _cv.value.description | default(omit) }}'
+      description: '{{ _cv.value.description | default(omit, True) }}'
 #      repositories: '{{ _repos | default(omit) }}'
       components: '{{ _components }}'
   ignore_errors: true

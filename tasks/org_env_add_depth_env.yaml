@@ -5,8 +5,8 @@
     server_url: 'https://{{ ansible_host }}'
     state: present
     name: '{{ _add_env.value.name }}'
-    description: '{{ _add_env.value.description | default(omit) }}'
-    label: '{{ _add_env.value.label | default(omit) }}'
+    description: '{{ _add_env.value.description | default(omit, True) }}'
+    label: '{{ _add_env.value.label | default(omit, True) }}'
     organization:  '{{ _add_env.value.organization.name }}'
-    prior:  '{{ _add_env.value.prior.name | default(omit) }}'
+    prior:  '{{ _add_env.value.prior.name | default(omit, True) }}'
   when: _add_env.value.name != "Library"  

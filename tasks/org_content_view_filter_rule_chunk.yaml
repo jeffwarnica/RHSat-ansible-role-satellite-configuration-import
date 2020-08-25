@@ -17,7 +17,7 @@
     name: '{{ _filter.name }}'
     filter_type: '{{ _filter.type }}'
     inclusion: '{{ _filter.inclusion }}'
-    architecture: '{{ _filter.architecture | default(omit) }}'
+    architecture: '{{ _filter.architecture | default(omit, True) }}'
     content_view: '{{ _cv.value.name }}'
     date_type: '{{ omit if _filter.type != "erratum" else _rule.date_type }}'
     description: '{{  _filter.description }}'
@@ -27,8 +27,8 @@
     end_date:  '{{ omit if _filter.type != "erratum" else _rule.end_date }}'
     start_date:  '{{ omit if _filter.type != "erratum" else _rule.start_date }}'
     errata_id: '{{ omit if _filter.type != "erratum" else _rule.errata_id}}'
-    max_version: '{{ omit if _filter.type != "rpm" else _rule.max_version | default(omit) }}'
-    min_version: '{{ omit if _filter.type != "rpm" else _rule.min_version | default(omit) }}'
+    max_version: '{{ omit if _filter.type != "rpm" else _rule.max_version | default(omit, True) }}'
+    min_version: '{{ omit if _filter.type != "rpm" else _rule.min_version | default(omit, True) }}'
     rule_name: '{{ _rule.uuid | default(omit) }}'
   loop: "{{ _filter.rules }}"
   loop_control:

@@ -60,8 +60,8 @@
     state: present
     organizations: '{{ _orgs }}'
     name: '{{ _installation_media.name }}'
-    path: '{{ _installation_media.path | default(omit) }}'
-    os_family: '{{ _installation_media.os_family | default(omit) }}'
+    path: '{{ _installation_media.path | default(omit, True) }}'
+    os_family: '{{ _installation_media.os_family | default(omit, True) }}'
     operatingsystems: '{{ _operatingsystems }}'
     locations: '{{ _locations }}' 
 

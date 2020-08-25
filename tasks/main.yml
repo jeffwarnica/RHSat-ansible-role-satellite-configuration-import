@@ -17,6 +17,9 @@
 - name: Organizations context
   import_tasks: organizations.yaml
 
+#- name: Global context (late)
+#  import_tasks: global_late.yml
+
 - name: Cleanup tmp location
   file:
     path: "{{ git_root_dir.path }}"
