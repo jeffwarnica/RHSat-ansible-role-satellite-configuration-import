@@ -28,3 +28,5 @@
     version: '{{ _cvv.version }}'
     description: '{{ _cvv.description }}'
   when:  _cv.value.name != "Default Organization View" #and not _cv.value.composite
+  ignore_errors: true
+

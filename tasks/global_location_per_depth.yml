@@ -2,10 +2,11 @@
     msg: 
       - "Workong on depth {{ item }}"
       - "Locations at [{{item}}] are: [{{locations[item]}}]"
+    verbosity: 2
 
 - name: "Loop over locations at depth [{{item}}]"
   include_tasks:  global_location_import.yml
-  loop: "{{ locations[item]|dict2items }}"
+  loop: "{{ locations[item]|dict2items|sort}}"
   loop_control:
     index_var: _location_idx
     loop_var: _location_to_add

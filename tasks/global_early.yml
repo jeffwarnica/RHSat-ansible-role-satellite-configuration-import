@@ -10,7 +10,6 @@
 - name: Top down, import per depth
   include_tasks: global_location_per_depth.yml
   loop: "{{locations.keys()|sort }}" 
-  when: false
 
 - name: Process each domain yaml
   include_tasks: global_domains_chunk.yaml
@@ -26,14 +25,26 @@
   loop_control:
     loop_var: _job_template_file
 
-#- fail:
-
 - name: Process each compute profile yaml
   include_tasks: global_compute_profiles_chunk.yaml
   with_fileglob:
     - '{{ git_root_dir.path }}/repo/managed/global/compute_profiles/*.yaml'
   loop_control:
     loop_var: _compute_profiles_file 
+
+- name: Process each provisioning templates yaml
+  include_tasks: global_provisioning_templates_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/provisioning_templates/*.yaml'
+  loop_control:
+    loop_var: _provisioning_templates_file 
+
+- name: Process each operatingsystems yaml
+  include_tasks: global_operatingsystems_chunk.yaml
+  with_fileglob:
+    - '{{ git_root_dir.path }}/repo/managed/global/operatingsystems/*.yaml'
+  loop_control:
+    loop_var: _operatingsystems_file
 
 - name: Process each compute resources yaml
   include_tasks: global_compute_resources_chunk.yaml
@@ -70,23 +81,11 @@
   loop_control:
     loop_var: _settings_file 
 
-- name: Process each users yaml
-  include_tasks: global_users_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global/users/*.yaml'
-  loop_control:
-    loop_var: _users_file 
+#- name: Process each users yaml
+#  include_tasks: global_users_chunk.yaml
+#  with_fileglob:
+#    - '{{ git_root_dir.path }}/repo/managed/global/users/*.yaml'
+#  loop_control:
+#    loop_var: _users_file 
 
-- name: Process each provisioning templates yaml
-  include_tasks: global_provisioning_templates_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global/provisioning_templates/*.yaml'
-  loop_control:
-    loop_var: _provisioning_templates_file 
 
-- name: Process each operatingsystems yaml
-  include_tasks: global_operatingsystems_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/global/operatingsystems/*.yaml'
-  loop_control:
-    loop_var: _operatingsystems_file 

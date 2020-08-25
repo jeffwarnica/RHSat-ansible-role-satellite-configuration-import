@@ -1,9 +1,5 @@
 ---
-- name: Hello World
-  debug:
-    msg: Hello from Ansible-Role-Satellite-Configuration-Import
-
-- name: create temporary git repository directory
+- name: Create temporary git repository directory
   tempfile:
     state: directory
   register: git_root_dir

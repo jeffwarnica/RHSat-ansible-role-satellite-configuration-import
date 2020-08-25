@@ -5,6 +5,7 @@
 - name: Debug out _this_cv_filters
   debug:
     var: _this_cv_filters
+  verbosity: 2
 
 - name: "Adding filter id: [ {{ _this_cv_filters }} ], rule ID [{{ _rule.id }}]"
   theforeman.foreman.content_view_filter:

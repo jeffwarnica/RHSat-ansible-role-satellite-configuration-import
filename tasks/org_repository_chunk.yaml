@@ -18,7 +18,7 @@
     password: '{{ satellite_api_password }}'
     server_url: 'https://{{ ansible_host }}'
     state: present
-    name: '{{ _repo.name }} IMPRTED!!!'
+    name: '{{ _repo.name }}'
     content_type: '{{ _repo.content_type }}'
     product: '{{ _repo.product.name }}' #Not the whole structure!
     organization: '{{ _org.name }}'

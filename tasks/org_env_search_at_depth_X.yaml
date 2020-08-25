@@ -5,7 +5,7 @@
       - "At children depth: [{{ _children_depth }}]"
       - "Searching for parent IDs: [{{ _search_for }}] "
       - "_found_something_at_depth: [{{ _found_something_at_depth }}]"
-    verbosity: 1
+    verbosity: 2
 
 - name: Reset _new_search_for
   set_fact:
@@ -23,7 +23,7 @@
       - "_environments_at_depth [{{ _environments_at_depth }}]"
       - "_found_something_at_depth: [{{ _found_something_at_depth }}]"
       - "_search_for: [{{ _search_for }}]"
-    verbosity: 1
+    verbosity: 2
 
 - name: Set new index vars
   set_fact:

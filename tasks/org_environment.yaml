@@ -43,6 +43,7 @@
 - name: Output all envs
   debug:
     var: environments
+    verbosity: 2
 
 #The Library is well known (by name), so load that, store it, and keep its ID handy for recursion
 - name: Load hunt for library
@@ -51,7 +52,7 @@
 
 - name: Save environment details
   set_fact:
-    _environments_at_depth: "{{ {0:  { _this_org_library.id |int:_this_org_library}  }  }}"
+    _environments_at_depth: "{{ {'0000':  { _this_org_library.id |int:_this_org_library}  }  }}"
     _found_something_at_depth: [0]
     _search_for: 
       0: "{{ [ _this_org_library.id |int ]}}"
@@ -69,7 +70,7 @@
 
 - name: Loop over environment depths
   include_tasks: org_env_add_depth.yaml
-  loop: "{{ _environments_at_depth|dict2items}}"
+  loop: "{{ _environments_at_depth|dict2items|sort}}"
   loop_control:
     loop_var: _add_depth
 
