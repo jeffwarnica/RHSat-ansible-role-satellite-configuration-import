@@ -3,6 +3,7 @@
     msg: 
       - "At depth [{{ _add_depth.key }}]"
       - "_add_depth.value: [{{ _add_depth.value }}]"
+    verbosity: 2
 
 - name: "Loop over individual environments at depth [{{ _add_depth.key}}]"
   include_tasks: org_env_add_depth_env.yaml

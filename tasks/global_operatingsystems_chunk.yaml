@@ -67,7 +67,6 @@
     major: '{{ _operatingsystem.major | default(omit) }}'
     ptables: '{{ _ptables }}' 
     minor: '{{ _operatingsystem.minor | default(omit) }}'
-    #os_family: '{{ _operatingsystem.family if _operatingsystem.family != " " else "Redhat" }}'
     os_family: "Redhat"
     provisioning_templates: '{{ _provisioning_templates }}'
     password_hash: '{{ _operatingsystem.password_hash | default(omit) }}'

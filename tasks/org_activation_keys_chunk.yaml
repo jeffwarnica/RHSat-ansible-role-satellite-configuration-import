@@ -62,4 +62,4 @@
     unlimited_hosts: '{{ _activation_key.unlimited_hosts | default(omit, True) }}'
     host_collections: '{{ _host_collections }}'
     #subscriptions: '{{ _products }}'
-  
+  ignore_errors: true  

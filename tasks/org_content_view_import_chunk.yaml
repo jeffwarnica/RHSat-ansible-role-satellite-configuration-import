@@ -32,6 +32,7 @@
     composite: false
     description: '{{ _cv.value.description | default(omit) }}'
     repositories: '{{ _repos | default(omit) }}'
+  ignore_errors: true
   when:  _cv.value.name != "Default Organization View" and not _cv.value.composite
 
 - name: Composite CV path
@@ -62,31 +63,32 @@
       description: '{{ _cv.value.description | default(omit) }}'
 #      repositories: '{{ _repos | default(omit) }}'
       components: '{{ _components }}'
+  ignore_errors: true
   when:  _cv.value.name != "Default Organization View" and _cv.value.composite
 
 
 ### Deal with CV Filters
 
-- name: Reset _this_cv_filters
-  set_fact:
-    _this_cv_filters: []
+#- name: Reset _this_cv_filters
+#  set_fact:
+#    _this_cv_filters: []
 
-- name: Build _this_cv_filters
-  set_fact:
-    _this_cv_filters: "{{ _this_cv_filters + [ _l.value.id ] }}"
-  when: _l.value.content_view.id == _cv.value.id
-  loop: "{{ content_view_filters | dict2items }}"
-  loop_control:
-    loop_var: _l 
+#- name: Build _this_cv_filters
+#  set_fact:
+#    _this_cv_filters: "{{ _this_cv_filters + [ _l.value.id ] }}"
+#  when: _l.value.content_view.id == _cv.value.id
+#  loop: "{{ content_view_filters | dict2items }}"
+#  loop_control:
+#    loop_var: _l 
 
-- name: Debug out _this_cv_filters
-  debug:
-    var: _this_cv_filters
+#- name: Debug out _this_cv_filters
+#  debug:
+#    var: _this_cv_filters
+#    verbosity: 2
 
-
-- name: "Processing each filter, by id: [ {{ _this_cv_filters }} ]"
-  include_tasks: org_content_view_filter_rule_chunk.yaml
-  loop: "{{ _this_cv_filters }}"
-  loop_control:
-    loop_var: _f_id 
+#- name: "Processing each filter, by id: [ {{ _this_cv_filters }} ]"
+#  include_tasks: org_content_view_filter_rule_chunk.yaml
+#  loop: "{{ _this_cv_filters }}"
+#  loop_control:
+#    loop_var: _f_id 
 

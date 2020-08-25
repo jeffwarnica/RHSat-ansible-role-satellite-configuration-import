@@ -4,7 +4,6 @@
 {% if 'advanced' in _line              %}  advanced: {{ _line.advanced }}{% endif %}
 {% if 'description' in _line           %}  description: {{ _line.description }}{% endif %}
 {% if 'fact_name' in _line             %}  fact_name: {{ _line.fact_name }}{% endif %}
-{% if 'input_type' in _line            %}  input_type: {{ _line.input_type }}{% endif %}
 {% if 'options' in _line               %}  options: {{ _line.options }}{% endif %}
 {% if 'puppet_class_name' in _line     %}  puppet_class_name: {{ _line.puppet_class_name }}{% endif %}
 {% if 'puppet_parameter_name' in _line %}  puppet_parameter_name: {{ _line.puppet_parameter_name }}{% endif %}
@@ -12,6 +11,9 @@
 {% if 'resource_type' in _line         %}  resource_type: {{ _line.resource_type }}{% endif %}
 {% if 'value_type' in _line            %}  value_type: {{ _line.value_type }}{% endif %}
 {% if 'variable_name' in _line         %}  variable_name: {{ _line.variable_name}}{% endif %}
+{% if _line.input_type == 'fact' and 'fact_name' not in _line %}  fact_name: {{ _line.name }}{% endif %}
+
+#line
 
 {% endfor %}
 

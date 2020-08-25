@@ -25,4 +25,5 @@
     server_url: 'https://{{ ansible_host }}'
     name: '{{ _setting.name }}'
     value: '{{ _setting.value }}'
-    
+  when: _setting.category_name not in ['Authentication']
+  ignore_errors: yes    

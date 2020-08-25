@@ -10,7 +10,6 @@
 
 - name: Add to global architectures dict
   set_fact:
-               # products dict, or empty dict, plus new k/v 
     architectures: "{{ architectures | default([]) | combine({_architecture.id: _architecture}) }}"
     _operatingsystems: []
 
@@ -37,5 +36,4 @@
     password: '{{ satellite_api_password }}' 
     server_url: 'https://{{ ansible_host }}'
     state: present
-    operatingsystems: '{{ _operatingsystems }}'
     name: '{{ _architecture.name }}'

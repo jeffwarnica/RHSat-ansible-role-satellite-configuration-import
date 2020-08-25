@@ -9,13 +9,10 @@
     msg:
         - "_cv is [{{ _cv }}]"
         - "content_view_versions is [[[\n{{ content_view_versions|to_nice_yaml }}\n]]]"
-#        - "[{{ _cvv.value.content_view.id }}] == [{{ _cv.value.id }}]"
     verbosity: 1 
 
 - name: "Loop over all versions, for all CVs, and create if [{{ _cvv.value.content_view.id }}] == [{{ _cv.value.id }}]"
-#  include_tasks: org_content_view_versions_create.yaml 
-  debug:
-    msg: "_cvv_id is [{{_cvv_id}}], and its content_view.id is [{{content_view_versions[_cvv_id].content_view.id  }}] Is == _cv.value.id [{{ _cv.value.id}} ]???"
+  include_tasks: org_content_view_versions_create.yaml 
   when: content_view_versions[_cvv_id].content_view.id == _cv.value.id
   loop: "{{ content_view_versions|sort }}"
   loop_control: 

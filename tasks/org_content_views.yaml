@@ -1,4 +1,14 @@
-
+#
+##
+##
+## As of 2020-08-25, we are not importing:
+#        Content View Filters (Foreman module bug)
+#               https://github.com/theforeman/foreman-ansible-modules/issues/695
+#        Content View Versions (buggy slow process, arguably pointless, anyway)
+#
+#    The code remains, but is commented out, pending bug fixes.
+#
+##
 #Content views are special insofar as they are regular or composite
 #So while more difficult to handle than n-layer recursive structures, 
 # we do have to do with 2 specific layers
@@ -30,27 +40,26 @@
   loop_control:
     loop_var: _content_view_file
 
+#- name: Load CV Versions
+#  include_tasks: org_content_view_versions_load_chunk.yaml
+#  with_fileglob:
+#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_view_versions/*.yaml'
+#  loop_control:
+#    loop_var: _cv_version_file
 
-- name: Load CV Versions
-  include_tasks: org_content_view_versions_load_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_view_versions/*.yaml'
-  loop_control:
-    loop_var: _cv_version_file
-
-- name: Load CV Filters
-  include_tasks: org_content_view_filters_load_chunk.yaml
-  with_fileglob:
-    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_view_filters/*.yaml'
-  loop_control:
-    loop_var: _cv_filter_file
+#- name: Load CV Filters
+#  include_tasks: org_content_view_filters_load_chunk.yaml
+#  with_fileglob:
+#    - '{{ git_root_dir.path }}/repo/managed/organizations/{{ _org.name }}/content_view_filters/*.yaml'
+#  loop_control:
+#    loop_var: _cv_filter_file
 
 - name: Debug out content_views and content_view_versions
   debug:
     var: content_views
     var: content_view_versions
     var: content_view_filters
-    verbosity: 1
+    verbosity: 2
 
 - name: Import non-composite CVs
   include_tasks: org_content_view_import_chunk.yaml
@@ -66,16 +75,16 @@
   loop_control:
     loop_var: _cv
 
-- name: Deal with non-composite CV versions
-  include_tasks: org_content_view_versions_chunk.yaml
-  when: not _cv.value.composite
-  loop: "{{ content_views|dict2items}}"
-  loop_control:
-    loop_var: _cv
+#- name: Deal with non-composite CV versions
+#  include_tasks: org_content_view_versions_chunk.yaml
+#  when: not _cv.value.composite
+#  loop: "{{ content_views|dict2items}}"
+#  loop_control:
+#    loop_var: _cv
 
-- name: Import composite CVs
-  include_tasks: org_content_view_versions_chunk.yaml
-  when: _cv.value.composite
-  loop: "{{ content_views|dict2items}}"
-  loop_control:
-    loop_var: _cv
+#- name: Import composite CVs
+#  include_tasks: org_content_view_versions_chunk.yaml
+#  when: _cv.value.composite
+#  loop: "{{ content_views|dict2items}}"
+#  loop_control:
+#    loop_var: _cv
