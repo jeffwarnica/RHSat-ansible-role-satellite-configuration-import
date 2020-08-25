@@ -12,29 +12,179 @@
   set_fact:
                # products dict, or empty dict, plus new k/v 
     compute_resources: "{{ compute_resources | default([]) | combine({_compute_resource.id: _compute_resource}) }}"
+    _orgs: []
+    _locations: []
+    _compute_profiles: []
     libvirt_provider_params:
-      url: '{{ _compute_resource.url }}'    
+      url: '{{ _compute_resource.url }}'
+      display_type: '{{ _compute_resource.display_type | default(omit, True) }}'    
     ovirt_provider_params:
       url: '{{ _compute_resource.url }}'    
-      user: '{{ _compute_resource.user }}'    
-      password: '{{ _compute_resource.password }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      ovirt_quota: '{{ _compute_resource.ovirt_quota | default (omit, True) }}'    
+      use_v4: '{{ _compute_resource.use_v4 | default(omit, True) }}'
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_ovirt_password }}' 
+    vmware_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_vmware_password }}' 
+    proxmox_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_proxmox_password }}' 
+      ssl_verify_peer: '{{ _compute_resource.ssl_verify_peer | default(omit, True) }}'
+    ec2_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_ec2_password }}' 
+      region: '{{ _compute_resource.region | default(omit, True) }}'
+    azurerm_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_azurerm_password }}' 
+      region: '{{ _compute_resource.region | default(omit, True) }}'
+      app_ident: '{{ _compute_resource.app_ident | default(omit, True) }}'
+      tenant: '{{ _compute_resource.tenant | default(omit, True) }}'
+    gce_provider_params:
+      url: '{{ _compute_resource.url }}'    
+      user: '{{ _compute_resource.user | default(omit, True) }}'    
+      datacenter: '{{ _compute_resource.datacenter | default(omit, True) }}'
+      password: '{{ compute_resource_gce_password | default(omit, True) }}' 
+      email: '{{ _compute_resource.email | default(omit, True) }}'
+      key_path: '{{ _compute_resource.key_path | default(omit, True) }}'
+      project: '{{ _compute_resource.project | default(omit, True) }}'
+      zone: '{{ _compute_resource.zone | default(omit, True) }}'
 
 - name: Debug out compute_resources
   debug:
     var: compute_resources
     verbosity: 2
 
-- name: Create/Update Compute Resources
+- name: Build orgs list
+  set_fact: 
+    _orgs: "{{ _orgs | default([]) + [ _r.title ] }}"
+  loop: '{{ _compute_resource.organizations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Debug out orgs
+  debug:
+    var: _orgs
+    verbosity: 2
+
+- name: Build locations list
+  set_fact: 
+    _locations: "{{ _locations | default([]) + [ _r.title ] }}"
+  loop: '{{ _compute_resource.locations | default([]) }}'
+  loop_control:
+    loop_var: _r
+
+- name: Create/Update Compute Resources for libvirt
   theforeman.foreman.compute_resource:
     username: '{{ satellite_api_username }}'
     password: '{{ satellite_api_password }}' 
     server_url: 'https://{{ ansible_host }}'
     state: present
-    organizations: '{{ _org.name }}'
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
     name: '{{ _compute_resource.name }}'
-    description: '{{ _compute_resource.description }}'
-    provider: '{{ _compute_resource.provider | lower }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "libvirt"
+    provider_params: "{{ libvirt_provider_params }}"
+  when: _compute_resource.provider == 'libvirt'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for Ovirt
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "ovirt"
     provider_params: '{{ ovirt_provider_params }}'
-     # url: '{{ _compute_resource.url }}'
-     # display_type: ' {{ _compute_resource.display_type | string }}'
-     # user: ' {{_compute_resource.user }}'     
+  when: _compute_resource.provider == 'Ovirt'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for vmware
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "vmware"
+    provider_params: '{{ ovirt_provider_params }}'
+  when: _compute_resource.provider == 'Vmware'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for proxmox
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "proxmox"
+    provider_params: '{{ proxmox_provider_params }}'
+  when: _compute_resource.provider == 'Proxmox'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for EC2
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "EC2"
+    provider_params: '{{ proxmox_provider_params }}'
+  when: _compute_resource.provider == 'EC2'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for AzureRm 
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "AzureRm"
+    provider_params: '{{ azurerm_provider_params }}'
+  when: _compute_resource.provider == 'AzureRM'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for GCE 
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "GCE"
+    provider_params: '{{ gce_provider_params }}'
+  when: _compute_resource.provider == 'GCE'
+  ignore_errors: yes
