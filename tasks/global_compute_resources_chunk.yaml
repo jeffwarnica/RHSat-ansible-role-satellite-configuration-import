@@ -84,7 +84,7 @@
   loop_control:
     loop_var: _r
 
-- name: Create/Update Compute Resources
+- name: Create/Update Compute Resources for libvirt
   theforeman.foreman.compute_resource:
     username: '{{ satellite_api_username }}'
     password: '{{ satellite_api_password }}' 
@@ -94,7 +94,97 @@
     locations: '{{ _locations }}'
     name: '{{ _compute_resource.name }}'
     description: '{{ _compute_resource.description | default(omit, True) }}'
-    provider: '{{ _compute_resource.provider | lower }}'
-    provider_params: "{% if _compute_resource.provider == 'Ovirt' %} ovirt_provider_params {% elif _compute_resourse.provider == 'vmware' %} vmware_provider_params {% endif %}"
+    provider: "libvirt"
+    provider_params: "{{ libvirt_provider_params }}"
+  when: _compute_resource.provider == 'libvirt'
   ignore_errors: yes
 
+- name: Create/Update Compute Resources for Ovirt
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "ovirt"
+    provider_params: '{{ ovirt_provider_params }}'
+  when: _compute_resource.provider == 'Ovirt'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for vmware
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "vmware"
+    provider_params: '{{ ovirt_provider_params }}'
+  when: _compute_resource.provider == 'Vmware'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for proxmox
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "proxmox"
+    provider_params: '{{ proxmox_provider_params }}'
+  when: _compute_resource.provider == 'Proxmox'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for EC2
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "EC2"
+    provider_params: '{{ proxmox_provider_params }}'
+  when: _compute_resource.provider == 'EC2'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for AzureRm 
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "AzureRm"
+    provider_params: '{{ azurerm_provider_params }}'
+  when: _compute_resource.provider == 'AzureRM'
+  ignore_errors: yes
+
+- name: Create/Update Compute Resources for GCE 
+  theforeman.foreman.compute_resource:
+    username: '{{ satellite_api_username }}'
+    password: '{{ satellite_api_password }}' 
+    server_url: 'https://{{ ansible_host }}'
+    state: present
+    organizations: '{{ _orgs }}'
+    locations: '{{ _locations }}'
+    name: '{{ _compute_resource.name }}'
+    description: '{{ _compute_resource.description | default(omit, True) }}'
+    provider: "GCE"
+    provider_params: '{{ gce_provider_params }}'
+  when: _compute_resource.provider == 'GCE'
+  ignore_errors: yes
